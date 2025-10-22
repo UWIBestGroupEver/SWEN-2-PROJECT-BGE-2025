@@ -3,14 +3,19 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
 from App.database import db, create_db
-from App.models import User
+from App.models import User, Employer, Position, Shortlist, Staff, Student
 from App.controllers import (
     create_user,
     get_all_users_json,
     login,
     get_user,
     get_user_by_username,
-    update_user
+    update_user,
+    open_position,
+    get_positions_by_employer,
+    add_student_to_shortlist,
+    get_shortlist_by_student,
+    decide_shortlist
 )
 
 
@@ -66,14 +71,15 @@ def test_authenticate():
 class UserIntegrationTests(unittest.TestCase):
 
     def test_create_user(self):
+        
         staff = create_user("rick", "bobpass", "staff")
         assert staff.username == "rick" 
 
-        #employer = create_user("sam", "sampass", "employer")
-        #assert employer.username == "sam"
+        employer = create_user("sam", "sampass", "employer")
+        assert employer.username == "sam"
 
-        #student = create_user("hannah", "hannahpass", "student")
-        #assert student.username == "hannah"
+        student = create_user("hannah", "hannahpass", "student")
+        assert student.username == "hannah"
 
    # def test_get_all_users_json(self):
      #   users_json = get_all_users_json()
@@ -85,4 +91,48 @@ class UserIntegrationTests(unittest.TestCase):
       #  user = get_user(1)
        # assert user.username == "ronnie"
         
+    def test_open_position(self):
+        employer = create_user("sally", "sallypass", "employer")
+        position = open_position("IT Support", employer.id, 2)
+        positions = get_positions_by_employer(employer.id)
+        assert [p.id == position.id for p in positions]
+
+    def test_add_to_shortlist(self):
+
+        staff = create_user("linda", "lindapass", "staff")
+        student = create_user("hank", "hankpass", "student")
+        employer =  create_user("ken", "kenpass", "employer")
+        position = open_position("Database Manager", employer.id, 3)
+        added_shortlist = add_student_to_shortlist(student.id, position.id ,staff.id)
+        assert (added_shortlist)
+        shortlists = get_shortlist_by_student(student.id)
+        assert [s.id == added_shortlist for s in shortlists]
+
+    def test_decide_shortlist(self):
+
+        student = create_user("jack", "jackpass", "student")
+        staff = create_user ("pat", "patpass", "staff")
+        employer =  create_user("frank", "pass", "employer")
+        position = open_position("Intern", employer.id, 4)
+        add_student_to_shortlist(student.id, position.id ,staff.id)
+        decide_shortlist(student.id, position.id, "accepted")
+        shortlists = get_shortlist_by_student(student.id)
+        assert [s.status == "approved" for s in shortlists]
+        assert position.number_of_positions == 3
+
+    def test_student_view_shortlist(self):
+
+        student = create_user("john", "johnpass", "student")
+        staff = create_user ("tim", "timpass", "staff")
+        employer =  create_user("joe", "joepass", "employer")
+        position = open_position("Software Intern", employer.id, 4)
+        shortlist = add_student_to_shortlist(student.id, position.id ,staff.id)
+        shortlists = get_shortlist_by_student(student.id)
+        assert [shortlist.id == s.id for s in shortlists]
+
+    # Tests data changes in the database
+    #def test_update_user(self):
+    #    update_user(1, "ronnie")
+    #   user = get_user(1)
+    #   assert user.username == "ronnie"
 
