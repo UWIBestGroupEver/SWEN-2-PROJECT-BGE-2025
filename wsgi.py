@@ -2,10 +2,10 @@ import click, pytest, sys
 from flask.cli import with_appcontext, AppGroup
 
 from App.database import db, get_migrate
-from App.models import User
+from App.models import User, Position, Student, Employer, Staff, Application, Shortlist
 from App.main import create_app
 from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize, open_position, add_student_to_shortlist, decide_shortlist, get_shortlist_by_student, get_shortlist_by_position, get_positions_by_employer)
-
+from App.controllers.application import (apply, shortlist, decide)
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -140,6 +140,44 @@ def get_positions_by_employer_command(employer_id):
             print("\n\n__________________________________________________________________________\n\n")
             
 app.cli.add_command(user_cli) # add the group to the cli
+
+
+'''
+Student Commands
+'''
+
+
+student_cli = AppGroup('student', help='Student object commands')
+
+@student_cli.command("create", help="Creates a student user")
+@click.argument("username", default="Daniel")
+@click.argument("password", default="12345")
+def create_student_command(username, password):
+    result = create_user(username, password, "student")
+    if result:
+        try:
+            print(f'Student {username} created with userID {result.id}!')
+        except Exception:
+            print(f'Student {username} created!')
+    else:
+        print("Student creation failed")
+        
+        
+@student_cli.command("apply", help="Student sends in an application")
+@click.argument("student_id", default=1)
+def apply_command(student_id):
+    try:
+        application = apply(student_id)
+        student = Student.query.filter_by(user_id=student_id).first()
+        username = student.username if student else "Unknown"
+        print(f'Application {application.id} created for student {username}, UserID: {student_id}!')
+
+    except PermissionError as e:
+        print(str(e))
+    
+app.cli.add_command(student_cli)
+
+
 
 '''
 Test Commands
