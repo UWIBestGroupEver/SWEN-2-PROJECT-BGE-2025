@@ -35,8 +35,13 @@ user_cli = AppGroup('user', help='User object commands')
 @click.argument("user_type", default="student")
 def create_user_command(username, password, user_type):
     result = create_user(username, password, user_type)
+    # `create_user` now returns the created User object on success, or False on failure
     if result:
-        print(f'{username} created!')
+        try:
+            print(f'{username} created with id {result.id}!')
+        except Exception:
+            # fallback if a truthy non-user value is returned
+            print(f'{username} created!')
     else:
         print("User creation failed")
 

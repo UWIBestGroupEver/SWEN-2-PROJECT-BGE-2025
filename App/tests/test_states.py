@@ -1,4 +1,4 @@
-# tests/test_state_pattern.py
+# Test cases for application state transitions to ensure correctness of the State Pattern implementation.
 
 import pytest
 
@@ -40,3 +40,50 @@ def test_invalid_transition_from_accepted(app_context):
     # Now try an illegal transition
     with pytest.raises(InvalidTransitionError):
         application.shortlist()
+def test_default_status_is_applied(app_context):
+    application = Application(student_id=1, position_id=10)
+    assert application.status == ApplicationStatus.APPLIED
+
+
+def test_rejected_flow_from_shortlisted(app_context):
+    # APPLIED → SHORTLISTED → REJECTED
+    application = Application(student_id=1, position_id=10)
+    application.shortlist()
+    assert application.status == ApplicationStatus.SHORTLISTED
+
+    application.reject()
+    assert application.status == ApplicationStatus.REJECTED
+
+
+def test_invalid_transition_applied_to_accepted(app_context):
+    # Should NOT be able to jump APPLIED → ACCEPTED directly
+    application = Application(student_id=1, position_id=10)
+
+    with pytest.raises(InvalidTransitionError):
+        application.accept()
+
+
+def test_invalid_transition_from_rejected(app_context):
+    # APPLIED → SHORTLISTED → REJECTED
+    application = Application(student_id=1, position_id=10)
+    application.shortlist()
+    application.reject()
+    assert application.status == ApplicationStatus.REJECTED
+
+    # All further moves should be invalid
+    with pytest.raises(InvalidTransitionError):
+        application.shortlist()
+
+    with pytest.raises(InvalidTransitionError):
+        application.accept()
+
+
+def test_invalid_double_accept(app_context):
+    application = Application(student_id=1, position_id=10)
+    application.shortlist()
+    application.accept()
+    assert application.status == ApplicationStatus.ACCEPTED
+
+    # Accepting again should not be allowed
+    with pytest.raises(InvalidTransitionError):
+        application.accept()

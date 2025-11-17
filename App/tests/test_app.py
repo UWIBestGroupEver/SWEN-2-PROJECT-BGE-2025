@@ -1,3 +1,5 @@
+#Unit and Integration tests need to be updated to reflect any model changes 
+
 import os, tempfile, pytest, logging, unittest
 from werkzeug.security import check_password_hash, generate_password_hash
 

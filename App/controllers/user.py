@@ -20,8 +20,10 @@ def create_user(username, password, user_type):
             return False
         
         db.session.commit()
-        return True
+        # return the created user object so callers can access `.id`
+        return newuser
     except Exception as e:
+        print("create_user error:", e)
         db.session.rollback()
         return False
 
