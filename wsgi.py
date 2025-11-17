@@ -174,10 +174,18 @@ def apply_command(student_id):
 
     except PermissionError as e:
         print(str(e))
-    
+
+@student_cli.command("applicationStatus", help="Get the status of an application")
+@click.argument("application_id", default=1)
+def application_status_command(application_id):
+    application = Application.query.get(application_id)
+    if application:
+        print(f'Application {application.id} status is {application.status.value}')
+    else:
+        print(f'Application {application_id} does not exist')
+
+
 app.cli.add_command(student_cli)
-
-
 
 '''
 Test Commands
