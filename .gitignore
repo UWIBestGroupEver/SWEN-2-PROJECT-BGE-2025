@@ -10,3 +10,6 @@ instance/test.db
 
 # Ignore environment files (optional)
 .env
+
+#venv
+venv/
