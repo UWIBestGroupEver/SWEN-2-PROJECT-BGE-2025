@@ -1,14 +1,19 @@
 from App.database import db
 from sqlalchemy import Enum
+from sqlalchemy.orm import reconstructor  
 import enum
 from datetime import datetime
+from typing import Optional
+from App.models.application_status import ApplicationStatus 
 
-
-class ApplicationStatus(enum.Enum):
-    APPLIED = "APPLIED"
-    SHORTLISTED = "SHORTLISTED"
-    ACCEPTED = "ACCEPTED"
-    REJECTED = "REJECTED"
+from App.models.states import (
+    ApplicationState,
+    AppliedState,
+    ShortlistedState,
+    AcceptedState,
+    RejectedState,
+    InvalidTransitionError,
+)
 
 
 class Application(db.Model):
@@ -38,7 +43,14 @@ class Application(db.Model):
     position = db.relationship('Position', backref=db.backref('applications', lazy=True))
 
 
-    def __init__(self, student_id, position_id, status=ApplicationStatus.APPLIED):
+ # ------------------------------------------------------------------
+    # non-persisted runtime state object (State Pattern)
+    # ------------------------------------------------------------------
+    _state = None
+
+    def __init__(self, student_id, position_id, status=ApplicationStatus.APPLIED, **kwargs):
+        super().__init__(**kwargs)
+
         self.student_id = student_id
         self.position_id = position_id
 
@@ -46,31 +58,65 @@ class Application(db.Model):
         if isinstance(status, ApplicationStatus):
             self.status = status
         else:
-            # fail fast on invalid values
             self.status = ApplicationStatus(status)
 
+        # create the initial state object based on status
+        self._init_state_from_status()
 
-    # ----------------------------------------------------------------------
-    # Context API methods for State Pattern
-    # ----------------------------------------------------------------------
-    # These methods represent the public actions that can be performed on an
-    # Application. At this stage, they simply update the status directly.
-    #
-    # Later, when the State Pattern is added, these methods will delegate
-    # the action to a State object instead of modifying status directly.
-    # ----------------------------------------------------------------------
+    @reconstructor
+    def init_on_load(self):
+        """
+        Called by SQLAlchemy after loading an instance from the DB.
+        We use this to rebuild the _state object from the stored status.
+        """
+        self._init_state_from_status()
+
+    # ------------------------------------------------------------------
+    # State Pattern plumbing
+    # ------------------------------------------------------------------
+
+    def _init_state_from_status(self):
+        """Internal helper: build correct state object from current status enum."""
+        mapping = {
+            ApplicationStatus.APPLIED: AppliedState,
+            ApplicationStatus.SHORTLISTED: ShortlistedState,
+            ApplicationStatus.ACCEPTED: AcceptedState,
+            ApplicationStatus.REJECTED: RejectedState,
+        }
+        state_cls = mapping.get(self.status, AppliedState)  # default safety
+        self._state = state_cls()
+        self._state.setContext(self)
+
+    def changeState(self, new_state: ApplicationState):
+        self._state = new_state
+        self._state.setContext(self)
+        self.status = new_state.status_value
+
+    # ------------------------------------------------------------------
+    # Public API methods for State Pattern (delegate to state object)
+    # ------------------------------------------------------------------
 
     def shortlist(self):
-        """Simple placeholder: change status directly (state logic added later)."""
-        self.status = ApplicationStatus.SHORTLISTED
+        """Ask the current state to perform a shortlist transition."""
+        if self._state is None:
+            self._init_state_from_status()
+        self._state.shortlist()
 
     def accept(self):
-        """Simple placeholder: change status directly (state logic added later)."""
-        self.status = ApplicationStatus.ACCEPTED
+        """Ask the current state to perform an accept transition."""
+        if self._state is None:
+            self._init_state_from_status()
+        self._state.accept()
 
     def reject(self):
-        """Simple placeholder: change status directly (state logic added later)."""
-        self.status = ApplicationStatus.REJECTED
+        """Ask the current state to perform a reject transition."""
+        if self._state is None:
+            self._init_state_from_status()
+        self._state.reject()
+
+    # ------------------------------------------------------------------
+    # Serialization
+    # ------------------------------------------------------------------
 
     def toJSON(self):
         return {
