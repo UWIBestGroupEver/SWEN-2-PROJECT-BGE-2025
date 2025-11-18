@@ -7,6 +7,8 @@ def create_user(username, password, user_type):
         db.session.add(newuser)
         db.session.flush() 
         
+        student = employer = staff = None
+
         if user_type == "student":
             student = Student(username=username, user_id=newuser.id)
             db.session.add(student)
@@ -20,8 +22,16 @@ def create_user(username, password, user_type):
             return False
         
         db.session.commit()
-        # return the created user object so callers can access `.id`
+
+        if user_type == "student":
+            return student
+        if user_type == "employer":
+            return employer
+        if user_type == "staff":
+            return staff
+
         return newuser
+
     except Exception as e:
         print("create_user error:", e)
         db.session.rollback()

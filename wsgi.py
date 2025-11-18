@@ -3,9 +3,13 @@ from flask.cli import with_appcontext, AppGroup
 
 from App.database import db, get_migrate
 from App.models import User, Position, Student, Employer, Staff, Application, Shortlist
+from App.models.application_status import ApplicationStatus
+from App.models.position import PositionStatus
 from App.main import create_app
 from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize, open_position, add_student_to_shortlist, decide_shortlist, get_shortlist_by_student, get_shortlist_by_position, get_positions_by_employer)
 from App.controllers.application import (apply, shortlist, decide)
+from App.controllers.student import add_gpa_to_student, add_degree_to_student, create_student
+from App.controllers.user import get_user
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -142,21 +146,37 @@ def get_positions_by_employer_command(employer_id):
 app.cli.add_command(user_cli) # add the group to the cli
 
 
-'''
-Student Commands
-'''
+
+
+##==========================================================================================================================================##
+
+
+
+
+
+##--------------------------------------------Student Commands--------------------------------------------##
+
 
 
 student_cli = AppGroup('student', help='Student object commands')
 
 @student_cli.command("create", help="Creates a student user")
-@click.argument("username", default="Daniel")
-@click.argument("password", default="12345")
-def create_student_command(username, password):
+def create_student_command():
+
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    gpa = input("Enter GPA: ")
+    degree = input("Enter Degree: ")
+    
     result = create_user(username, password, "student")
+
+    add_degree_to_student(result.id, degree)
+    add_gpa_to_student(result.id, gpa)
+    
+
     if result:
         try:
-            print(f'Student {username} created with userID {result.id}!')
+            print(f'Student {username} created with userID {result.user_id}!')
         except Exception:
             print(f'Student {username} created!')
     else:
@@ -164,28 +184,123 @@ def create_student_command(username, password):
         
         
 @student_cli.command("apply", help="Student sends in an application")
-@click.argument("student_id", default=1)
-def apply_command(student_id):
+
+def apply_command():
+    student_id = input("Enter student userID: ")
     try:
         application = apply(student_id)
         student = Student.query.filter_by(user_id=student_id).first()
         username = student.username if student else "Unknown"
-        print(f'Application {application.id} created for student {username}, UserID: {student_id}!')
+        print(f'Application created for student {username}, ApplicationID: {application.id}!')
 
     except PermissionError as e:
         print(str(e))
 
 @student_cli.command("applicationStatus", help="Get the status of an application")
-@click.argument("application_id", default=1)
-def application_status_command(application_id):
+def application_status_command():
+    application_id = input("Enter application ID: ")
     application = Application.query.get(application_id)
     if application:
         print(f'Application {application.id} status is {application.status.value}')
     else:
         print(f'Application {application_id} does not exist')
 
-
 app.cli.add_command(student_cli)
+
+
+
+##--------------------------------------------Staff Commands--------------------------------------------##
+staff_cli = AppGroup('staff', help='Staff object commands')
+
+@staff_cli.command("create", help="Creates a staff user")
+def create_staff_command():
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    
+    result = create_user(username, password, "staff")
+    
+    if result:
+        try:
+            print(f'Staff {username} created with userID {result.user_id}!')
+        except Exception:
+            print(f'Staff {username} created!')
+    else:
+        print("Staff creation failed")
+
+
+@staff_cli.command("shortlist", help="Staff shortlists an application")
+def shortlist_command():
+    
+    print("\n")
+    staff_id = input("Please Enter staff userID: ")
+
+    # Only show applications that are in the APPLIED state
+    apps = Application.query.filter_by(status=ApplicationStatus.APPLIED).order_by(Application.id).all()
+    if not apps:
+        print('No applications found')
+        return
+
+    print("\nApplications:")
+    for a in apps:
+        student_name = a.student.username if getattr(a, 'student', None) else 'Unknown'
+        student_user_id = a.student.user_id if getattr(a, 'student', None) else 'Unknown'
+        student_gpa = a.student.gpa if getattr(a, 'student', None) else 'Unknown'
+        student_degree = a.student.degree if getattr(a, 'student', None) else 'Unknown'
+        print(f'ApplicationID: {a.id}: Student {student_name} (UserID: {student_user_id}), Degree: {student_degree}, GPA: {student_gpa} — Status: {a.status.value}')
+
+    # Show all OPEN positions
+    open_positions = Position.query.filter_by(status=PositionStatus.open).order_by(Position.id).all()
+
+    print("\nOpen Positions:")
+    if not open_positions:
+        print("No open positions available.")
+        return
+
+    for p in open_positions:
+        print(f'Position {p.id}: {p.title} — Openings: {p.number_of_positions} (Employer {p.employer_id})')
+
+    application_id = input("\nEnter application ID: ")
+    position_id = input("Enter position ID: ")
+
+    name = Position.query.get(position_id).title if Position.query.get(position_id) else "Unknown"
+    studentname = Application.query.get(application_id).student.username if Application.query.get(application_id) and Application.query.get(application_id).student else "Unknown"
+    staff = get_user(staff_id) 
+    staffname = staff.username if User else "Unknown"
+    try:
+        sl = shortlist(staff_id, application_id, position_id)
+        print(f'\nApplication {sl.application_id} ({studentname}) shortlisted for position {name} (ID:{sl.position_id}) by {staffname} (StaffID:{staff_id})!\n')
+    except PermissionError as e:
+        print(str(e))
+
+
+app.cli.add_command(staff_cli)
+
+
+##-----------------------------------------Employer Commands-----------------------------------------##
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 '''
 Test Commands

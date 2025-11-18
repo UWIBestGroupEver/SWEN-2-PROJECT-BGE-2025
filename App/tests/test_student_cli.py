@@ -25,13 +25,20 @@ def app_with_db():
 
 def test_student_create_cli(app_with_db):
     runner = app_with_db.test_cli_runner()
-    result = runner.invoke(args=['student', 'create', 'studcli', 'studpass'])
+    # The updated CLI `student create` reads interactive input in order:
+    # username, password, gpa, degree
+    input_payload = 'studcli\nstudpass\n3.75\nComputer Science\n'
+    result = runner.invoke(args=['student', 'create'], input=input_payload)
     assert result.exit_code == 0
     assert 'studcli' in result.output
 
-    # verify Student record created
+    # verify Student record created and fields saved
     student = Student.query.filter_by(username='studcli').first()
     assert student is not None
+    # degree should be the string provided
+    assert student.degree == 'Computer Science'
+    # gpa column is Float; allow approximate comparison
+    assert float(student.gpa) == pytest.approx(3.75)
 
 
 def test_student_apply_cli(app_with_db):
