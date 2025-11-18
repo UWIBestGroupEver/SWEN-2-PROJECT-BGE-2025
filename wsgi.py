@@ -149,10 +149,33 @@ app.cli.add_command(user_cli) # add the group to the cli
 
 
 ##==========================================================================================================================================##
+employer_cli = AppGroup('employer', help='Employer object commands')
 
+@user_cli.command("accept_application", help="Employer accepts an application")
+@click.argument("employer_id", default=1)
+@click.argument("application_id", default=1)
+def accept_application_command(employer_id,application_id):
+    application=decide(employer_id,application_id,"accepted")
+    if application:
+        print(f'Application {application_id} accepted!')
+        print("\n\n__________________________________________________________________________\n\n")
+    else:
+        print(f'Application {application_id} could not be accepted')
+        print("\n\n__________________________________________________________________________\n\n")
 
+@user_cli.command("reject_application", help="Employer rejects an application")
+@click.argument("employer_id", default=1)
+@click.argument("application_id", default=1)
+def reject_application_command(employer_id,application_id):
+    application=decide(employer_id,application_id,"rejected")
+    if application:
+        print(f'Application {application_id} rejected.')
+        print("\n\n__________________________________________________________________________\n\n")
+    else:
+        print(f'Application {application_id} could not be rejected')
+        print("\n\n__________________________________________________________________________\n\n")
 
-
+app.cli.add_command(employer_cli) # add the group to the cli
 
 ##--------------------------------------------Student Commands--------------------------------------------##
 
