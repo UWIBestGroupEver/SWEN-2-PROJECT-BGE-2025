@@ -1,5 +1,13 @@
 # App/controllers/shortlist.py
 
+
+##IMPORTANT##
+##LOGIC MOVED TO APP/CONTROLLERS/APPLICATION.PY##
+'''WILL BE DELETED SOON'''
+'''IGNORE THIS FILE'''
+
+
+
 from App.models import Shortlist, Position, Staff, Student, Application
 from App.models.shortlist import DecisionStatus
 from App.database import db

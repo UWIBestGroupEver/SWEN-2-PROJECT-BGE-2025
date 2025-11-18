@@ -1,5 +1,12 @@
 #Unit and Integration tests need to be updated to reflect any model changes 
 
+
+##IMPORTANT##
+'''THIS IS THE OLD TEST FILE FOR USER, STUDENT, STAFF, EMPLOYER, POSITION, SHORTLIST MODELS'''
+'''WILL BE DELETED SOON'''
+'''IGNORE THIS FILE'''
+
+
 import os, tempfile, pytest, logging, unittest
 from werkzeug.security import check_password_hash, generate_password_hash
 

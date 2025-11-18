@@ -75,7 +75,7 @@ def shortlist(staff_user_id, application_id, position_id):
 def decide(employer_user_id, application_id, decision):
     """
     Employer makes the final decision on an application.
-    `decision` should be 'ACCEPTED' or 'REJECTED'.
+    decision should be 'ACCEPTED' or 'REJECTED'.
     """
     employer = Employer.query.filter_by(user_id=employer_user_id).first()
     if not employer:
@@ -85,16 +85,32 @@ def decide(employer_user_id, application_id, decision):
     if not application:
         raise ValueError("Application not found.")
 
-    # Enforce that application has been shortlisted at least once
-    if not application.shortlists:
+    # Enforce that application has been shortlisted
+    shortlist = Shortlist.query.filter_by(application_id=application.id).first()
+    if not shortlist:
         raise InvalidTransitionError("Application must be shortlisted before a decision.")
 
-    normalized = decision.upper()
+    # Get the position via the shortlist (assuming FK/relationship exists)
+    position = shortlist.position
+
+    # Optional: ensure employer owns this position (uncomment & adjust field names)
+    # if position.employer_id != employer.id:
+    #     raise PermissionError("You can only decide applications for your own positions.")
+
+    normalized = decision.strip().upper()
 
     if normalized == ApplicationStatus.ACCEPTED.value:
         application.accept()
+        shortlist.update_status(normalized)
+
+        # Decrement available positions if your model supports this
+        if hasattr(position, "update_number_of_positions"):
+            position.update_number_of_positions(position.number_of_positions - 1)
+
     elif normalized == ApplicationStatus.REJECTED.value:
         application.reject()
+        shortlist.update_status(normalized)
+
     else:
         raise ValueError("Decision must be either 'ACCEPTED' or 'REJECTED'.")
 

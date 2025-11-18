@@ -32,3 +32,11 @@ def get_positions_by_employer_json(user_id):
     if positions:
         return [position.toJSON() for position in positions]
     return []
+
+def decrement_position_number(position_id):
+    position = Position.query.get(position_id)
+    if position and position.number > 0:
+        position.number -= 1
+        db.session.commit()
+        return position.number
+    return None

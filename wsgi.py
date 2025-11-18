@@ -10,6 +10,8 @@ from App.controllers import ( create_user, get_all_users_json, get_all_users, in
 from App.controllers.application import (apply, shortlist, decide)
 from App.controllers.student import add_gpa_to_student, add_degree_to_student, create_student
 from App.controllers.user import get_user
+from App.models.shortlist import DecisionStatus
+
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -26,156 +28,130 @@ def init():
 User Commands
 '''
 
-# Commands can be organized using groups
+# # Commands can be organized using groups
 
-# create a group, it would be the first argument of the comand
-# eg : flask user <command>
-user_cli = AppGroup('user', help='User object commands') 
+# # create a group, it would be the first argument of the comand
+# # eg : flask user <command>
+# user_cli = AppGroup('user', help='User object commands') 
 
-# Then define the command and any parameters and annotate it with the group (@)
-@user_cli.command("create", help="Creates a user")
-@click.argument("username", default="rob")
-@click.argument("password", default="robpass")
-@click.argument("user_type", default="student")
-def create_user_command(username, password, user_type):
-    result = create_user(username, password, user_type)
-    # `create_user` now returns the created User object on success, or False on failure
-    if result:
-        try:
-            print(f'{username} created with id {result.id}!')
-        except Exception:
-            # fallback if a truthy non-user value is returned
-            print(f'{username} created!')
-    else:
-        print("User creation failed")
+# # Then define the command and any parameters and annotate it with the group (@)
+# @user_cli.command("create", help="Creates a user")
+# @click.argument("username", default="rob")
+# @click.argument("password", default="robpass")
+# @click.argument("user_type", default="student")
+# def create_user_command(username, password, user_type):
+#     result = create_user(username, password, user_type)
+#     # `create_user` now returns the created User object on success, or False on failure
+#     if result:
+#         try:
+#             print(f'{username} created with id {result.id}!')
+#         except Exception:
+#             # fallback if a truthy non-user value is returned
+#             print(f'{username} created!')
+#     else:
+#         print("User creation failed")
 
-# this command will be : flask user create bob bobpass
+# # this command will be : flask user create bob bobpass
 
-@user_cli.command("list", help="Lists users in the database")
-@click.argument("format", default="string")
-def list_user_command(format):
-    if format == 'string':
-        print(get_all_users())
-    else:
-        print(get_all_users_json())
+# @user_cli.command("list", help="Lists users in the database")
+# @click.argument("format", default="string")
+# def list_user_command(format):
+#     if format == 'string':
+#         print(get_all_users())
+#     else:
+#         print(get_all_users_json())
 
-@user_cli.command("add_position", help="Adds a position")
-@click.argument("title", default="Software Engineer")
-@click.argument("employer_id", default=1)
-@click.argument("number", default=1)
-def add_position_command(title, employer_id, number):
-    position = open_position(title, employer_id, number)
-    if position:
-        print(f'{title} created!')
-    else:
-        print(f'Employer {employer_id} does not exist')
+# @user_cli.command("add_position", help="Adds a position")
+# @click.argument("title", default="Software Engineer")
+# @click.argument("employer_id", default=1)
+# @click.argument("number", default=1)
+# def add_position_command(title, employer_id, number):
+#     position = open_position(title, employer_id, number)
+#     if position:
+#         print(f'{title} created!')
+#     else:
+#         print(f'Employer {employer_id} does not exist')
 
-@user_cli.command("add_to_shortlist", help="Adds a student to a shortlist")
-@click.argument("student_id", default=1)
-@click.argument("position_id", default=1)
-@click.argument("staff_id", default=1)
-def add_to_shortlist_command(student_id, position_id, staff_id):
-    test = add_student_to_shortlist(student_id, position_id, staff_id)
-    if test:
-        print(f'Student {student_id} added to shortlist for position {position_id}')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print('One of the following is the issue:')
-        print(f'    Position {position_id} is not open')
-        print(f'    Student {student_id} already in shortlist for position {position_id}')
-        print(f'    There is no more open slots for position {position_id}')
-        print("\n\n__________________________________________________________________________\n\n")
+# @user_cli.command("add_to_shortlist", help="Adds a student to a shortlist")
+# @click.argument("student_id", default=1)
+# @click.argument("position_id", default=1)
+# @click.argument("staff_id", default=1)
+# def add_to_shortlist_command(student_id, position_id, staff_id):
+#     test = add_student_to_shortlist(student_id, position_id, staff_id)
+#     if test:
+#         print(f'Student {student_id} added to shortlist for position {position_id}')
+#         print("\n\n__________________________________________________________________________\n\n")
+#     else:
+#         print('One of the following is the issue:')
+#         print(f'    Position {position_id} is not open')
+#         print(f'    Student {student_id} already in shortlist for position {position_id}')
+#         print(f'    There is no more open slots for position {position_id}')
+#         print("\n\n__________________________________________________________________________\n\n")
 
-@user_cli.command("decide_shortlist", help="Decides on a shortlist")
-@click.argument("student_id", default=1)
-@click.argument("position_id", default=1)
-@click.argument("decision", default="accepted")
-def decide_shortlist_command(student_id, position_id, decision):
-    test = decide_shortlist(student_id, position_id, decision)
-    if test:
-        print(f'Student {student_id} is {decision} for position {position_id}')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Student {student_id} not in shortlist for position {position_id}')
-        print("\n\n__________________________________________________________________________\n\n")
+# @user_cli.command("decide_shortlist", help="Decides on a shortlist")
+# @click.argument("student_id", default=1)
+# @click.argument("position_id", default=1)
+# @click.argument("decision", default="accepted")
+# def decide_shortlist_command(student_id, position_id, decision):
+#     test = decide_shortlist(student_id, position_id, decision)
+#     if test:
+#         print(f'Student {student_id} is {decision} for position {position_id}')
+#         print("\n\n__________________________________________________________________________\n\n")
+#     else:
+#         print(f'Student {student_id} not in shortlist for position {position_id}')
+#         print("\n\n__________________________________________________________________________\n\n")
 
-@user_cli.command("get_shortlist", help="Gets a shortlist for a student")
-@click.argument("student_id", default=1)
-def get_shortlist_command(student_id):
-    list = get_shortlist_by_student(student_id)
-    if list:
-        for item in list:
-            print(f'Student {item.student_id} is {item.status.value} for position {item.position_id}')
+# @user_cli.command("get_shortlist", help="Gets a shortlist for a student")
+# @click.argument("student_id", default=1)
+# def get_shortlist_command(student_id):
+#     list = get_shortlist_by_student(student_id)
+#     if list:
+#         for item in list:
+#             print(f'Student {item.student_id} is {item.status.value} for position {item.position_id}')
 
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Student {student_id} has no shortlists')
-        print("\n\n__________________________________________________________________________\n\n")
+#         print("\n\n__________________________________________________________________________\n\n")
+#     else:
+#         print(f'Student {student_id} has no shortlists')
+#         print("\n\n__________________________________________________________________________\n\n")
 
-@user_cli.command("get_shortlist_by_position", help="Gets a shortlist for a position")
-@click.argument("position_id", default=1)
-def get_shortlist_by_position_command(position_id):
-    list = get_shortlist_by_position(position_id)
-    if list:
-        for item in list:
-            print(f'Student {item.student_id} is {item.status.value} for {item.position.title} id: {item.position_id}')
-            print(f'    Staff {item.staff_id} added this student to the shortlist')
-            print(f'    Position {item.position_id} is {item.position.status.value}')
-            print(f'    Position {item.position_id} has {item.position.number_of_positions} slots')
-            print(f'    Position {item.position_id} is for {item.position.title}')
-            print("\n\n__________________________________________________________________________\n\n")
+# @user_cli.command("get_shortlist_by_position", help="Gets a shortlist for a position")
+# @click.argument("position_id", default=1)
+# def get_shortlist_by_position_command(position_id):
+#     list = get_shortlist_by_position(position_id)
+#     if list:
+#         for item in list:
+#             print(f'Student {item.student_id} is {item.status.value} for {item.position.title} id: {item.position_id}')
+#             print(f'    Staff {item.staff_id} added this student to the shortlist')
+#             print(f'    Position {item.position_id} is {item.position.status.value}')
+#             print(f'    Position {item.position_id} has {item.position.number_of_positions} slots')
+#             print(f'    Position {item.position_id} is for {item.position.title}')
+#             print("\n\n__________________________________________________________________________\n\n")
 
-    else:
-        print(f'Position {position_id} has no shortlists')
-        print("\n\n__________________________________________________________________________\n\n")
+#     else:
+#         print(f'Position {position_id} has no shortlists')
+#         print("\n\n__________________________________________________________________________\n\n")
 
-@user_cli.command("get_positions_by_employer", help="Gets all positions for an employer")
-@click.argument("employer_id", default=1)
-def get_positions_by_employer_command(employer_id):
-    list = get_positions_by_employer(employer_id)
-    if list:
-        for item in list:
-            print(f'Position {item.id} is {item.status.value}')
-            print(f'    Position {item.id} has {item.number_of_positions} slots')
-            print(f'    Position {item.id} is for {item.title}')
-            print("\n\n__________________________________________________________________________\n\n")
-    else:
-            print(f'Employer {employer_id} has no positions')
-            print("\n\n__________________________________________________________________________\n\n")
+# @user_cli.command("get_positions_by_employer", help="Gets all positions for an employer")
+# @click.argument("employer_id", default=1)
+# def get_positions_by_employer_command(employer_id):
+#     list = get_positions_by_employer(employer_id)
+#     if list:
+#         for item in list:
+#             print(f'Position {item.id} is {item.status.value}')
+#             print(f'    Position {item.id} has {item.number_of_positions} slots')
+#             print(f'    Position {item.id} is for {item.title}')
+#             print("\n\n__________________________________________________________________________\n\n")
+#     else:
+#             print(f'Employer {employer_id} has no positions')
+#             print("\n\n__________________________________________________________________________\n\n")
             
-app.cli.add_command(user_cli) # add the group to the cli
+# app.cli.add_command(user_cli) # add the group to the cli
 
 
 
 
 ##==========================================================================================================================================##
-employer_cli = AppGroup('employer', help='Employer object commands')
 
-@user_cli.command("accept_application", help="Employer accepts an application")
-@click.argument("employer_id", default=1)
-@click.argument("application_id", default=1)
-def accept_application_command(employer_id,application_id):
-    application=decide(employer_id,application_id,"accepted")
-    if application:
-        print(f'Application {application_id} accepted!')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Application {application_id} could not be accepted')
-        print("\n\n__________________________________________________________________________\n\n")
-
-@user_cli.command("reject_application", help="Employer rejects an application")
-@click.argument("employer_id", default=1)
-@click.argument("application_id", default=1)
-def reject_application_command(employer_id,application_id):
-    application=decide(employer_id,application_id,"rejected")
-    if application:
-        print(f'Application {application_id} rejected.')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Application {application_id} could not be rejected')
-        print("\n\n__________________________________________________________________________\n\n")
-
-app.cli.add_command(employer_cli) # add the group to the cli
 
 ##--------------------------------------------Student Commands--------------------------------------------##
 
@@ -301,8 +277,98 @@ app.cli.add_command(staff_cli)
 
 ##-----------------------------------------Employer Commands-----------------------------------------##
 
+employer_cli = AppGroup('employer', help='Employer object commands')
+
+@employer_cli.command("create", help="Creates an employer user")
+def create_employer_command():
+    username = input("Enter username: ")
+    password = input("Enter password: ")
+    
+    result = create_user(username, password, "employer")
+    
+    if result:
+        try:
+            print(f'Employer {username} created with userID {result.user_id}!')
+        except Exception:
+            print(f'Employer {username} created!')
+    else:
+        print("Employer creation failed")
 
 
+@employer_cli.command("openPosition", help="Employer opens a position")
+def open_position_command():
+    employer_id = input("Enter employer userID: ")
+    
+    if not Employer.query.filter_by(user_id=employer_id).first():
+        print(f"No employer found with user ID {employer_id}.")
+        return
+    
+    title = input("Enter position title: ")
+    number = input("Enter number of positions: ")
+    
+    position = open_position(title, employer_id, int(number))
+    if position:
+        print(f'Position {title} created!')
+    else:
+        print(f'Employer {employer_id} does not exist')
+
+
+
+@employer_cli.command("decide", help="Employer accepts an application")
+def accept_application_command():
+    employer_id = input("Enter employer ID: ")
+    
+    # Retrieve the employer
+    employer = Employer.query.filter_by(user_id=employer_id).first()
+    if not employer:
+        print(f"No employer found with user ID {employer_id}.")
+        return
+    
+    # Get all positions for this employer
+    positions = Position.query.filter_by(employer_id=employer.id).all()
+    if not positions:
+        print(f"No positions found for employer {employer.username} (User ID: {employer_id}).")
+        return
+    
+    # Display shortlisted applications for the employer's positions
+    print(f"\nShortlisted Applications for Positions Offered by {employer.username} (Employer User ID: {employer_id}):")
+    shortlisted_found = False
+    for position in positions:
+        shortlists = Shortlist.query.filter_by(position_id=position.id, status=DecisionStatus.PENDING).all()
+        if shortlists:
+            shortlisted_found = True
+            print(f"\nPosition: {position.title} (ID: {position.id}, Openings: {position.number_of_positions})")
+            for sl in shortlists:
+                application = sl.application
+                if application and application.student:
+                    student = application.student
+                    print(f"  - Application ID: {application.id}, Student: {student.username} (User ID: {student.user_id}), Degree: {student.degree}, GPA: {student.gpa}, Status: {sl.status.value}")
+                else:
+                    print(f"  - Application ID: {application.id} (Student details unavailable), Status: {sl.status.value}")
+    
+    if not shortlisted_found:
+        print("No shortlisted applications pending decision for your positions.")
+        return
+    
+    application_id = input("\nEnter application ID to make a decision on: ")
+    descesion = input("Enter decision (Accept = 1 /Reject = 0): ")
+    if descesion not in ["1", "0"]:
+        print("Invalid decision. Please enter '1' for Accept or '0' for Reject.")
+        return
+    if descesion == "1":
+        verdict = "ACCEPTED"
+    if descesion == "0":
+        verdict = "REJECTED"
+    application=decide(employer_id,application_id, verdict)
+    if application:
+        print(f'Application {application_id} {verdict}!')
+        print("\n\n__________________________________________________________________________\n\n")
+    else:
+        print(f'Application {application_id} could not be {verdict}')
+        print("\n\n__________________________________________________________________________\n\n")
+   
+
+app.cli.add_command(employer_cli) # add the group to the cli
 
 
 
