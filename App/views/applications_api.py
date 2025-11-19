@@ -1,10 +1,12 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
 from App.models import Application, Student, Shortlist
-from App.controllers.application import apply
+from App.controllers.application import apply,decide
 from App.models.application_status import ApplicationStatus
 from App.controllers.shortlist import add_student_to_shortlist
 from App.models.staff import Staff
+from App.models.employer import Employer
+
 
 
 applications_api = Blueprint('applications_api', __name__, url_prefix="/api/applications")
@@ -118,3 +120,21 @@ def get_shortlist_info(application_id):
     return jsonify({
         "message": f"Student with user id {application.student.user_id} shortlisted successfully to shortlist {shortlist_entry.id}"
     }), 201
+
+@applications_api.route("/<int:application_id>/decision", methods=['POST'])
+@jwt_required()
+def make_decision(application_id):
+    application = Application.query.get(application_id)
+    if not application:
+       return jsonify({"message": "Application not found"}), 404
+    curr = current_user
+    if current_user.role != "employer":
+        return jsonify({"message": "Only employers can make decisions on applications"}), 403
+    if application.status.name != "SHORTLISTED":
+        return jsonify({"message": "Application is not in SHORTLISTED status"}), 400
+    data = request.json
+    decision = data.get("decision")
+    if decision not in ["ACCEPTED", "REJECTED"]:
+        return jsonify({"message": "Decision must be either 'ACCEPTED' or 'REJECTED'"}), 400
+    application = decide(curr.id, application_id, decision)
+    return jsonify({"message": f"Application {application_id} has been {decision.lower()}."}), 200
