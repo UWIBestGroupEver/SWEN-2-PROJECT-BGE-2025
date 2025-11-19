@@ -3,6 +3,8 @@ from flask_jwt_extended import jwt_required, current_user
 from App.models import Application, Student, Shortlist
 from App.controllers.application import apply
 from App.models.application_status import ApplicationStatus
+from App.controllers.shortlist import add_student_to_shortlist
+from App.models.staff import Staff
 
 
 applications_api = Blueprint('applications_api', __name__, url_prefix="/api/applications")
@@ -17,9 +19,15 @@ def student_apply():
     data = request.json
     curr = current_user
     students = Student.query.all()
+    
+    applications = Application.query.all()
+    for app in applications:
+        if app.student.user_id == curr.id:
+            return jsonify({"message": f"Student with user id {app.student.user_id} has already sent in an application"}), 400
+    
     for student in students:
         if student.user_id == curr.id:
-            apply(student.id)
+            application = apply(curr.id)
             return jsonify({"message": f"Application submitted successfully for student number {student.id}. Application status: Applied"}), 201
     return jsonify({"message": "Only students can submit applications"}), 403
 
@@ -79,3 +87,34 @@ def get_application(application_id):
     
     
     return jsonify(application_data), 200
+
+@applications_api.route("/<int:application_id>/shortlist", methods=['POST'])
+@jwt_required()
+def get_shortlist_info(application_id):
+    application = Application.query.get(application_id)
+    if not application:
+        return jsonify({"message": "Application not found"}), 404
+
+    if application.status.name != "APPLIED":
+        return jsonify({"message": "Application is not in APPLIED status"}), 400
+
+    curr = current_user
+    staff = Staff.query.filter_by(user_id=curr.id).first()
+    if not staff:
+        return jsonify({"message": "Only staff can shortlist applications"}), 403
+    
+    data = request.json
+    position_id = data.get("position_id")
+
+    shortlist_entry = add_student_to_shortlist(
+        application.student.user_id,
+        position_id,
+        staff.user_id
+    )
+
+    if not shortlist_entry:
+        return jsonify({"message": "Failed to shortlist student"}), 400
+
+    return jsonify({
+        "message": f"Student with user id {application.student.user_id} shortlisted successfully to shortlist {shortlist_entry.id}"
+    }), 201
