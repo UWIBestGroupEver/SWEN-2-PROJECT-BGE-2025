@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
-from App.models import Application, Student
+from App.models import Application, Student, Shortlist
 from App.controllers.application import apply
+from App.models.application_status import ApplicationStatus
 
 
 applications_api = Blueprint('applications_api', __name__, url_prefix="/api/applications")
@@ -35,3 +36,46 @@ def get_applications():
             "status": app.status.name
         })
     return jsonify(applications_list), 200
+
+@applications_api.route("/<int:application_id>", methods=['GET'])
+@jwt_required()
+def get_application(application_id):
+    application = Application.query.get(application_id)
+    if not application:
+        return jsonify({"message": "Application not found"}), 404
+    
+    if application.status.name == "APPLIED": 
+        application_data = {
+            "application_id": application.id,
+            "student_id": application.student_id,
+            "status": application.status.name
+        }
+    
+    if application.status.name == "SHORTLISTED":
+        shortlist = Shortlist.query.filter_by(application_id=application.id).first()
+        position = shortlist.position
+        application_data = {
+            "application_id": application.id,
+            "student_id": application.student_id,
+            "status": application.status.name,
+            "position": {
+                "position_id": position.id,
+                "title": position.title
+            }
+        }
+    
+    if application.status.name == "ACCEPTED" or application.status.name == "REJECTED":
+        shortlist = Shortlist.query.filter_by(application_id=application.id).first()
+        position = shortlist.position
+        application_data = {
+            "application_id": application.id,
+            "student_id": application.student_id,
+            "status": application.status.name,
+            "position": {
+                "position_id": position.id,
+                "title": position.title
+            },  
+        }
+    
+    
+    return jsonify(application_data), 200
