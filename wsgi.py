@@ -151,7 +151,7 @@ app.cli.add_command(user_cli) # add the group to the cli
 ##==========================================================================================================================================##
 employer_cli = AppGroup('employer', help='Employer object commands')
 
-@user_cli.command("accept_application", help="Employer accepts an application")
+@employer_cli.command("accept_application", help="Employer accepts an application")
 @click.argument("employer_id", default=1)
 @click.argument("application_id", default=1)
 def accept_application_command(employer_id,application_id):
@@ -163,7 +163,7 @@ def accept_application_command(employer_id,application_id):
         print(f'Application {application_id} could not be accepted')
         print("\n\n__________________________________________________________________________\n\n")
 
-@user_cli.command("reject_application", help="Employer rejects an application")
+@employer_cli.command("reject_application", help="Employer rejects an application")
 @click.argument("employer_id", default=1)
 @click.argument("application_id", default=1)
 def reject_application_command(employer_id,application_id):

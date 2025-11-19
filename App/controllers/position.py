@@ -4,7 +4,7 @@ from App.database import db
 def open_position(title,user_id, number_of_positions=1):
     employer = Employer.query.filter_by(user_id=user_id).first()
     if not employer:
-        return False
+        return None
 
     new_position = Position(title=title, number=number_of_positions, employer_id=employer.id)
     db.session.add(new_position)
@@ -13,7 +13,7 @@ def open_position(title,user_id, number_of_positions=1):
         return new_position
     except Exception as e:
         db.session.rollback()
-        return False
+        return None
 
 
 def get_positions_by_employer(user_id):

@@ -22,6 +22,9 @@ def empty_db():
         yield app.test_client()
         db.drop_all()
 
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
 
 def test_apply_creates_application_without_position(empty_db):
     """Student apply creates APPLIED application with no position info."""
