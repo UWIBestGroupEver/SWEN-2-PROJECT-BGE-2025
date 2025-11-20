@@ -10,6 +10,7 @@ from App.controllers import ( create_user, get_all_users_json, get_all_users, in
 from App.controllers.application import (apply, shortlist, decide)
 from App.controllers.student import add_gpa_to_student, add_degree_to_student, create_student
 from App.controllers.user import get_user
+from App.cli import register_employer_commands
 
 # This commands file allow you to create convenient CLI commands for testing controllers
 
@@ -148,35 +149,8 @@ app.cli.add_command(user_cli) # add the group to the cli
 
 
 
-##==========================================================================================================================================##
-employer_cli = AppGroup('employer', help='Employer object commands')
-
-@employer_cli.command("accept_application", help="Employer accepts an application")
-@click.argument("employer_id", default=1)
-@click.argument("application_id", default=1)
-def accept_application_command(employer_id,application_id):
-    application=decide(employer_id,application_id,"accepted")
-    if application:
-        print(f'Application {application_id} accepted!')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Application {application_id} could not be accepted')
-        print("\n\n__________________________________________________________________________\n\n")
-
-@employer_cli.command("reject_application", help="Employer rejects an application")
-@click.argument("employer_id", default=1)
-@click.argument("application_id", default=1)
-def reject_application_command(employer_id,application_id):
-    application=decide(employer_id,application_id,"rejected")
-    if application:
-        print(f'Application {application_id} rejected.')
-        print("\n\n__________________________________________________________________________\n\n")
-    else:
-        print(f'Application {application_id} could not be rejected')
-        print("\n\n__________________________________________________________________________\n\n")
-
-app.cli.add_command(employer_cli) # add the group to the cli
-
+##=============================================Employer Commands==========================================================================##
+register_employer_commands(app)
 ##--------------------------------------------Student Commands--------------------------------------------##
 
 

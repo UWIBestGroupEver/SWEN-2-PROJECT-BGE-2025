@@ -7,6 +7,7 @@ from werkzeug.datastructures import  FileStorage
 
 from App.database import init_db
 from App.config import load_config
+from App.views import views #setup_admin
 
 
 from App.controllers import (
@@ -14,13 +15,11 @@ from App.controllers import (
     add_auth_context
 )
 
-from App.views import views #setup_admin
-
-
-
 def add_views(app):
     for view in views:
         app.register_blueprint(view)
+
+from App.cli import register_employer_commands
 
 def create_app(overrides={}):
     app = Flask(__name__, static_url_path='/static')
@@ -37,5 +36,7 @@ def create_app(overrides={}):
     @jwt.unauthorized_loader
     def custom_unauthorized_response(error):
         return render_template('401.html', error=error), 401
+    
+    register_employer_commands(app)
     app.app_context().push()
     return app
