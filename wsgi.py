@@ -1,3 +1,4 @@
+from flask import current_app
 import click, pytest, sys
 from flask.cli import with_appcontext, AppGroup
 
@@ -181,21 +182,20 @@ def create_student_command():
         
         
 @student_cli.command("apply", help="Student sends in an application")
-
-def apply_command():
-    student_id = input("Enter student userID: ")
+@click.argument("student_id", required=True,default=1) #require user to provide student id
+def apply_command(student_id):
     try:
-        application = apply(student_id)
-        student = Student.query.filter_by(user_id=student_id).first()
+        stud_id_int = int(student_id)
+        application = apply(stud_id_int)
+        student = Student.query.filter_by(user_id=stud_id_int).first()
         username = student.username if student else "Unknown"
         print(f'Application created for student {username}, ApplicationID: {application.id}!')
-
     except PermissionError as e:
         print(str(e))
 
 @student_cli.command("applicationStatus", help="Get the status of an application")
-def application_status_command():
-    application_id = input("Enter application ID: ")
+@click.argument("application_id", required=True,default=1)
+def application_status_command(application_id):
     application = Application.query.get(application_id)
     if application:
         print(f'Application {application.id} status is {application.status.value}')

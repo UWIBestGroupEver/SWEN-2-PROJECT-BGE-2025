@@ -1,9 +1,16 @@
 # App/controllers/shortlist.py
 
+from sqlalchemy import or_
 from App.models import Shortlist, Position, Staff, Student, Application
 from App.models.shortlist import DecisionStatus
+from App.models.position import PositionStatus
 from App.database import db
 
+def _resolve_user(model,identifier):
+    """ Helper to resolve a user by user_id (FK) or id (PK) """
+    if identifier is None:
+        return None
+    return db.session.query(model).filter(or_(model.user_id==identifier,model.id==identifier)).first()
 
 def add_student_to_shortlist(student_id, position_id, staff_id):
     """
@@ -13,8 +20,8 @@ def add_student_to_shortlist(student_id, position_id, staff_id):
     - staff_id:   Staff.user_id
     - position_id: Position.id
     """
-    teacher = db.session.query(Staff).filter_by(user_id=staff_id).first()
-    student = db.session.query(Student).filter_by(user_id=student_id).first()
+    teacher=_resolve_user(Staff, staff_id)
+    student=_resolve_user(Student, student_id)
     if student is None or teacher is None:
         return False
 
@@ -37,14 +44,21 @@ def add_student_to_shortlist(student_id, position_id, staff_id):
     )
 
     position = (
-        db.session.query(Position)
-        .filter(
-            Position.id == position_id,
-            Position.number_of_positions > 0,
-            Position.status == "open",
-        )
+        #db.session.query(Position)
+        db.session.query(Position) 
+        .filter(Position.id==position_id)
         .first()
     )
+
+    position_is_open=False
+    if position: #check if position is open
+        try:
+            if isinstance(position.status,PositionStatus):
+                position_is_open = (position.status == PositionStatus.OPEN)
+            else:
+                position_is_open=(str(position.status).upper() == str(PositionStatus.OPEN).upper() or str(position.status).upper()=="OPEN")
+        except:
+            position_is_open=False
 
     if teacher and not existing and position:
         shortlist = Shortlist(
@@ -70,7 +84,7 @@ def decide_shortlist(student_id, position_id, decision):
     - student_id: Student.user_id
     - decision: 'ACCEPTED' or 'REJECTED' (case-insensitive)
     """
-    student = db.session.query(Student).filter_by(user_id=student_id).first()
+    student = _resolve_user(Student, student_id)
     if student is None:
         return False
 
@@ -133,10 +147,10 @@ def get_shortlist_by_student(student_id):
     """
     Get shortlist entries for a student by their user_id.
     """
-    student = db.session.query(Student).filter_by(user_id=student_id).first()
+    student = _resolve_user(Student, student_id)
     if student is None:
         return []
-
+    
     return (
         db.session.query(Shortlist)
         .join(Application, Shortlist.application_id == Application.id)

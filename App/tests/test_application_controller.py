@@ -18,8 +18,9 @@ from App.controllers import create_user, open_position  # existing funcs
 def empty_db():
     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
     with app.app_context():
-        create_db()
+        db.create_all()
         yield app.test_client()
+        db.session.remove()
         db.drop_all()
 
 @pytest.fixture

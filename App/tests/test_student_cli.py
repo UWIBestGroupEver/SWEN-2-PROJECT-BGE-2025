@@ -89,9 +89,13 @@ def test_application_status_cli_after_shortlist_and_decide(app_with_db):
     # after shortlist, status should be SHORTLISTED
     runner = app_with_db.test_cli_runner()
     result1 = runner.invoke(args=['student', 'applicationStatus', str(app_obj.id)])
+    assert result1.exit_code == 0
     assert 'SHORTLISTED' in result1.output
 
     # decide to accept
     decided = decide(employer.id, app_obj.id, 'ACCEPTED')
+    
     result2 = runner.invoke(args=['student', 'applicationStatus', str(app_obj.id)])
+
+    assert result2.exit_code == 0
     assert 'ACCEPTED' in result2.output

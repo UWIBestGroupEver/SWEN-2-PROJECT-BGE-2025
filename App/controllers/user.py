@@ -1,5 +1,6 @@
 from App.models import User, Student, Employer, Staff
 from App.database import db
+import traceback
 
 def create_user(username, password, user_type):
     try:
@@ -33,7 +34,7 @@ def create_user(username, password, user_type):
         return newuser
 
     except Exception as e:
-        print("create_user error:", e)
+        print("create_user error:", repr(e))
         db.session.rollback()
         return False
 

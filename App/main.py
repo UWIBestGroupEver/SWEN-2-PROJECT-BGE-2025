@@ -15,11 +15,12 @@ from App.controllers import (
     add_auth_context
 )
 
+from App.cli import register_employer_commands
+
 def add_views(app):
     for view in views:
         app.register_blueprint(view)
 
-from App.cli import register_employer_commands
 
 def create_app(overrides={}):
     app = Flask(__name__, static_url_path='/static')

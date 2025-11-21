@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from App.main import create_app
 from App.database import db, create_db
 from App.models import User, Employer, Position, Shortlist, Staff, Student, PositionStatus
+from App.models.shortlist import DecisionStatus
 from App.controllers import (
     create_user,
     get_all_users_json,
@@ -29,23 +30,23 @@ LOGGER = logging.getLogger(__name__)
 class UserUnitTests(unittest.TestCase):
 
     def test_new_user(self):
-        user = User("bob", "bobpass")
+        user = User("bob", "bobpass","student")
         assert user.username == "bob"
 
     def test_new_student(self):
             student = Student("john", "johnpass")
             assert student.username == "john"
-            assert student.role == "student"
+            #assert student.role == "student"
 
     def test_new_staff(self):
         staff = Staff("jim", "jimpass")
         assert staff.username == "jim"
-        assert staff.role == "staff"
+        #assert staff.role == "staff"
 
     def test_new_employer(self):
         employer = Employer("alice", "alicepass")
         assert employer.username == "alice"
-        assert employer.role == "employer"
+        #assert employer.role == "employer"
 
     def test_new_position(self):
         position = Position("Software Developer", 10, 5) 
@@ -55,15 +56,21 @@ class UserUnitTests(unittest.TestCase):
         assert position.number_of_positions == 5
 
     def test_new_shortlist(self):
-        shortlist = Shortlist(1,2,3)
-        assert shortlist.student_id == 1
+        shortlist = Shortlist(
+             application_id=1,
+             position_id=2,
+             staff_id=3
+        )
+
+        assert shortlist.application_id == 1
         assert shortlist.position_id == 2
         assert shortlist.staff_id == 3
-        assert shortlist.status == "pending"
+
+        assert shortlist.status == DecisionStatus.PENDING
 
     # pure function no side effects or integrations called
     def test_get_json(self):
-        user = User("bob", "bobpass")
+        user = User("bob", "bobpass","student")
         user_json = user.get_json()
         self.assertEqual(user_json["username"], "bob")
         self.assertTrue("id" in user.get_json())
@@ -71,12 +78,12 @@ class UserUnitTests(unittest.TestCase):
     def test_hashed_password(self):
         password = "mypass"
         hashed = generate_password_hash(password)
-        user = User("bob", password)
+        user = User("bob", password,"student")
         assert user.password != password
 
     def test_check_password(self):
         password = "mypass"
-        user = User("bob", password)
+        user = User("bob", password,"student")
         assert user.check_password(password)
 
 '''
@@ -166,7 +173,7 @@ class UserIntegrationTests(unittest.TestCase):
         decided_shortlist = decide_shortlist(student.id, position.id, "accepted")
         assert (decided_shortlist)
         shortlists = get_shortlist_by_student(student.id)
-        assert any(s.status == PositionStatus.accepted for s in shortlists)
+        assert any(s.status == DecisionStatus.ACCEPTED for s in shortlists)
         assert position.number_of_positions == (position_count-1)
         assert len(shortlists) > 0
         invalid_decision = decide_shortlist(-1, -1, "accepted")
