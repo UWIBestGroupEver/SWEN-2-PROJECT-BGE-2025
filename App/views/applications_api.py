@@ -1,9 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
 from App.models import Application, Student, Shortlist
-from App.controllers.application import apply,decide
+from App.controllers.application import apply,decide,shortlist
 from App.models.application_status import ApplicationStatus
-from App.controllers.shortlist import add_student_to_shortlist
 from App.models.staff import Staff
 from App.models.employer import Employer
 
@@ -93,6 +92,12 @@ def get_application(application_id):
 @applications_api.route("/<int:application_id>/shortlist", methods=['POST'])
 @jwt_required()
 def get_shortlist_info(application_id):
+    
+    curr = current_user
+    staff = Staff.query.filter_by(user_id=curr.id).first()
+    if not staff:
+        return jsonify({"message": "Only staff can shortlist applications"}), 403
+    
     application = Application.query.get(application_id)
     if not application:
         return jsonify({"message": "Application not found"}), 404
@@ -100,19 +105,12 @@ def get_shortlist_info(application_id):
     if application.status.name != "APPLIED":
         return jsonify({"message": "Application is not in APPLIED status"}), 400
 
-    curr = current_user
-    staff = Staff.query.filter_by(user_id=curr.id).first()
-    if not staff:
-        return jsonify({"message": "Only staff can shortlist applications"}), 403
+    
     
     data = request.json
     position_id = data.get("position_id")
 
-    shortlist_entry = add_student_to_shortlist(
-        application.student.user_id,
-        position_id,
-        staff.user_id
-    )
+    shortlist_entry = shortlist(curr.id, application_id, position_id)
 
     if not shortlist_entry:
         return jsonify({"message": "Failed to shortlist student"}), 400
