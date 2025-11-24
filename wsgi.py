@@ -195,7 +195,7 @@ def apply_command():
     except PermissionError as e:
         print(str(e))
 
-@student_cli.command("applicationStatus", help="Get the status of an application")
+@student_cli.command("application_status", help="Get the status of an application")
 def application_status_command():
     application_id = input("Enter application ID: ")
     application = Application.query.get(application_id)
@@ -295,7 +295,7 @@ def create_employer_command():
         print("Employer creation failed")
 
 
-@employer_cli.command("openPosition", help="Employer opens a position")
+@employer_cli.command("open_position", help="Employer opens a position")
 def open_position_command():
     employer_id = input("Enter employer userID: ")
     
@@ -314,8 +314,8 @@ def open_position_command():
 
 
 
-@employer_cli.command("decide", help="Employer accepts an application")
-def accept_application_command():
+@employer_cli.command("decide", help="Employer accepts or denies an application")
+def decide_application_command():
     employer_id = input("Enter employer ID: ")
     
     # Retrieve the employer
