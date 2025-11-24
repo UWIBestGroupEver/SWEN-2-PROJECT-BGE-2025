@@ -371,41 +371,36 @@ def accept_application_command():
 app.cli.add_command(employer_cli) # add the group to the cli
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 '''
 Test Commands
 '''
 
 test = AppGroup('test', help='Testing commands') 
 
-@test.command("user", help="Run User tests")
-@click.argument("type", default="all")
-def user_tests_command(type):
-    if type == "unit":
-        sys.exit(pytest.main(["-k", "UserUnitTests"]))
-    elif type == "int":
-        sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
-    else:
-        sys.exit(pytest.main(["-k", "App"]))
-    
+@test.command("all", help="Run all tests")
+def all_tests_command():
+    """Run all unit and integration tests"""
+    sys.exit(pytest.main([
+        "App/tests/unit_controller_tests.py",
+        "App/tests/unit_model_tests.py", 
+        "App/tests/integration_tests.py",
+        "-v"
+    ]))
+
+@test.command("unitcontroller", help="Run all controller tests")
+def controller_tests_command():
+    """Run unit controller tests only"""
+    sys.exit(pytest.main(["App/tests/unit_controller_tests.py", "-v"]))
+
+@test.command("unitmodel", help="Run all model tests")
+def model_tests_command():
+    """Run unit model tests only"""
+    sys.exit(pytest.main(["App/tests/unit_model_tests.py", "-v"]))
+
+@test.command("integration", help="Run integration tests")
+def integration_tests_command():
+    """Run integration tests only"""
+    sys.exit(pytest.main(["App/tests/integration_tests.py", "-v"]))
+
 
 app.cli.add_command(test)
