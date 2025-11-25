@@ -26,17 +26,19 @@ students, staff & employers of companies that need a simple system to have stude
 
 ---
 
-## User commands
+## App commands
 
 | Command | Description | Usage | Example Usage |
 |---------|-------------|-------|---------------|
-|`flask user list`| Lists all the users in the database |
-|`flask user add_position`| Adds a new position (job opening) | flask user add_position *position name* | flask user add_position *Software Engineer* *1* *1* |
-|`flask user add_to_shortlist`| Adds a student to a position's shortlist | flask user add_to_shortlist *student_id* *position_id* *staff_id* | flask user add_to_shortlist *1* *1* *1* |
-|`flask user decide_shortlist`| Decides on a student/position shortlist entry (accepted/rejected) | flask user decide_shortlist *student_id* *position_id* *decision* | flask user decide_shortlist *1* *1* *accepted* |
-|`flask user get_shortlist`| Retrieves the shortlist entries for a student | flask user get_shortlist *student_id* | flask user get_shortlist *2* |
-|`flask user get_shortlist_by_position`| Retrieves all shortlist entries for a specific position | flask user get_shortlist_by_position *position_id* | flask user get_shortlist_by_position *3* |
-|`flask user get_position_by_employer`| Gets all positions opened by a specific employer | flask user get_positions_by_employer *employer_id* | flask user get_positions_by_employer *2* |
+|`flask list_users`| Lists all the users in the database |
+|`flask list_students`| Lists all the students in the database |
+|`flask list_employers`| Lists all the employers in the database |
+|`flask list_staff`| Lists all the staff in the database |
+|`flask list_positions`| Lists all the positions in the database |
+|`flask list_applications`| Lists all the applications in the database |
+|`flask list_shortlist`| Lists all the shortlists in the database |
+|`flask view_approved_applications`| Lists all approved applications in the database |
+|`flask view_rejected_applications`| Lists all rejected applications in the database |
 
 ---
 
@@ -69,8 +71,10 @@ students, staff & employers of companies that need a simple system to have stude
 ## Test Commands
 | Command | Description | Usage | Example Usage |
 |---------|-------------|-------|---------------|
-|`flask test user`| Runs pytest tests. Types include **unitcontroller**,**integration**,**unitmodel** | flask test user *type* | flask test user *unit* |
 |`flask test all`| Runs all pytest tests |
+|`flask test unitcontroller`| Runs all controller tests |
+|`flask test unitmodel`| Runs all model tests |
+|`flask test integration`| Runs all integration tests |
 
 **Modifying test output**
 Place these at the end of the test command to change the output accordingly
@@ -86,5 +90,3 @@ If changes are made to the models, the database must be 'migrated' to be synced 
 `flask db migrate`
 `flask db upgrade`
 `flask db --help`
-
-
