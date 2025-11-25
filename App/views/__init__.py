@@ -7,7 +7,8 @@ from .auth import auth_views
 from .position import position_views
 from .shortlist import shortlist_views
 from .applications_api import applications_api
+from .applications_api import api
 
 
-views = [user_views, index_views, auth_views, position_views, shortlist_views, applications_api] 
+views = [user_views, index_views, auth_views, position_views, shortlist_views, applications_api, api] 
 # blueprints must be added to this list

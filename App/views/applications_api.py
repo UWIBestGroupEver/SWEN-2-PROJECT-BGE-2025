@@ -3,12 +3,15 @@ from flask_jwt_extended import jwt_required, current_user
 from App.models import Application, Student, Shortlist
 from App.controllers.application import apply,decide,shortlist
 from App.models.application_status import ApplicationStatus
+from App.controllers.user import create_user
 from App.models.staff import Staff
 from App.models.employer import Employer
 
 
 
 applications_api = Blueprint('applications_api', __name__, url_prefix="/api/applications")
+
+api = Blueprint('api', __name__, url_prefix="/api")
 
 @applications_api.route("/ping", methods=['GET'])
 def ping():
@@ -136,3 +139,21 @@ def make_decision(application_id):
         return jsonify({"message": "Decision must be either 'ACCEPTED' or 'REJECTED'"}), 400
     application = decide(curr.id, application_id, decision)
     return jsonify({"message": f"Application {application_id} has been {decision.lower()}."}), 200
+
+@api.route("/user_signup", methods=['POST'])
+def api_signup():
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
+    user_type = data.get("type")
+    if not username or not password or not user_type:
+        return jsonify({"message": "Username, password, and role are required"}), 400
+    
+    if user_type not in ["student", "employer", "staff"]:
+        return jsonify({"message": "Role must be either 'student', 'employer', or 'staff'"}), 400
+    
+    status = create_user(username, password, user_type)
+    if not status:
+        return jsonify({"message": "Signup failed, username taken!"}), 401
+    return jsonify({"message": "Signup successful"}), 201
+
