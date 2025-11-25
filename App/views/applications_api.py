@@ -4,8 +4,11 @@ from App.models import Application, Student, Shortlist
 from App.controllers.application import apply,decide,shortlist
 from App.models.application_status import ApplicationStatus
 from App.controllers.user import create_user
+from App.controllers.position import open_position
 from App.models.staff import Staff
 from App.models.employer import Employer
+from App.models.position import Position
+from App.controllers.student import add_degree_to_student, add_gpa_to_student
 
 
 
@@ -152,8 +155,48 @@ def api_signup():
     if user_type not in ["student", "employer", "staff"]:
         return jsonify({"message": "Role must be either 'student', 'employer', or 'staff'"}), 400
     
+    if user_type == "student":
+        gpa = data.get("gpa")
+        degree = data.get("degree")
+        if gpa is None or degree is None:
+            return jsonify({"message": "GPA and degree are required for student signup"}), 400
+        status = create_user(username, password, user_type)
+        add_degree_to_student(status.id, degree)
+        add_gpa_to_student(status.id, gpa)
+        return jsonify({"message": "Signup successful"}), 201
+    
     status = create_user(username, password, user_type)
     if not status:
         return jsonify({"message": "Signup failed, username taken!"}), 401
     return jsonify({"message": "Signup successful"}), 201
 
+@api.route("/openings/<int:id>", methods=['POST'])
+@jwt_required()
+def create_opening(id):
+    curr = current_user
+    if curr.role != "employer":
+        return jsonify({"message": "Only employers can create job openings"}), 403
+    
+    data = request.json
+    title = data.get("title")
+    number = data.get("number")
+    if not title or not number:
+        return jsonify({"message": "Title and number of positions are required"}), 400
+    opening = open_position(title,curr.id, number)
+    if not opening:
+        return jsonify({"message": "Failed to create job opening"}), 400
+    return jsonify({"message": "Job opening created successfully", "opening_id": opening.id}), 201
+
+@api.route("/openings", methods=['GET'])
+@jwt_required()
+def list_openings():
+    positions = Position.query.all()
+    positions_list = []
+    for pos in positions:
+        positions_list.append({
+            "position_id": pos.id,
+            "title": pos.title,
+            "number_of_positions": pos.number_of_positions,
+            "employer_id": pos.employer_id
+        })
+    return jsonify(positions_list), 200
