@@ -71,6 +71,7 @@ def user_login_api():
   set_access_cookies(response, token)
   return response
 
+'''''
 @auth_views.route('/api/signup', methods=['POST'])
 def signup_api():
     data = request.json
@@ -83,7 +84,7 @@ def signup_api():
         response = jsonify(access_token=token)
         set_access_cookies(response, token) 
         return response
-
+'''
 @auth_views.route('/api/identify', methods=['GET'])
 @jwt_required()
 def identify_user():

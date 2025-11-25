@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request,flash
 from flask_jwt_extended import jwt_required, current_user
 from App.models import Application, Student, Shortlist
 from App.controllers.application import apply,decide,shortlist
@@ -9,7 +9,8 @@ from App.models.staff import Staff
 from App.models.employer import Employer
 from App.models.position import Position
 from App.controllers.student import add_degree_to_student, add_gpa_to_student
-
+from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, set_access_cookies
+from App.controllers import login
 
 
 applications_api = Blueprint('applications_api', __name__, url_prefix="/api/applications")
@@ -143,7 +144,7 @@ def make_decision(application_id):
     application = decide(curr.id, application_id, decision)
     return jsonify({"message": f"Application {application_id} has been {decision.lower()}."}), 200
 
-@api.route("/user_signup", methods=['POST'])
+@api.route("/signup", methods=['POST'])
 def api_signup():
     data = request.json
     username = data.get("username")
@@ -163,14 +164,24 @@ def api_signup():
         status = create_user(username, password, user_type)
         if not status:
             return jsonify({"message": "Signup failed, username taken!"}), 401
-        add_degree_to_student(status.id, degree)
-        add_gpa_to_student(status.id, gpa)
-        return jsonify({"message": "Signup successful"}), 201
+        else:
+            token = login(data['username'], data['password'])
+            flash('Signup Successful')
+            response = jsonify(access_token=token)
+            set_access_cookies(response, token) 
+            add_degree_to_student(status.id, degree)
+            add_gpa_to_student(status.id, gpa)
+            return response
     
     status = create_user(username, password, user_type)
     if not status:
         return jsonify({"message": "Signup failed, username taken!"}), 401
-    return jsonify({"message": "Signup successful"}), 201
+    else:
+        token = login(data['username'], data['password'])
+        flash('Signup Successful')
+        response = jsonify(access_token=token)
+        set_access_cookies(response, token) 
+        return response
 
 @api.route("/openings/<int:id>", methods=['POST'])
 @jwt_required()
