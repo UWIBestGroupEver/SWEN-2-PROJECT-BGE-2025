@@ -1,11 +1,11 @@
 from .user import create_user
 from .shortlist import add_student_to_shortlist
 from .position import open_position
-from .application import apply
-from .application import shortlist
+from .application import apply, shortlist, decide
 from App.models.application import Application
 from App.models.student import Student
 from App.database import db
+from App.models.application_status import ApplicationStatus
 
 import random
 
@@ -21,6 +21,7 @@ def initialize():
     positions=open_positions(employers)
     apply_students(students)
     assign_shortlist(students,positions,staff)
+    decide_applications(employers, staff)
 
 def create_employers():
     users=[]
@@ -79,6 +80,24 @@ def apply_students(students):
             apply(student_user_id=s.user_id)
         except Exception as e:
             print(f"Error applying student {s.id}: {e}")
+
+def decide_applications(employers, staff):
+    # Create two new students
+    student1 = create_user("bob", "bobpass", "student", gpa=3.8, degree="Computer Science")
+    student2 = create_user("sally", "sallypass", "student", gpa=3.2, degree="Software Engineering")
+
+    # Have them apply
+    app1 = apply(student_user_id=student1.user_id)
+    app2 = apply(student_user_id=student2.user_id)
+
+    # Shortlist them
+    pos = open_position("Software Developer", employers[0].id, 2)
+    shortlist(staff[0].user_id, app1.id, pos.id)
+    shortlist(staff[0].user_id, app2.id, pos.id)
+
+    # Decide on their applications
+    decide(employers[0].user_id, app1.id, "ACCEPTED")
+    decide(employers[0].user_id, app2.id, "REJECTED")
 
 def assign_shortlist(students,positions,staff):
     std=students[0]
