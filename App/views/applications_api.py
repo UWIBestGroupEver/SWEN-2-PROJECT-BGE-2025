@@ -161,6 +161,8 @@ def api_signup():
         if gpa is None or degree is None:
             return jsonify({"message": "GPA and degree are required for student signup"}), 400
         status = create_user(username, password, user_type)
+        if not status:
+            return jsonify({"message": "Signup failed, username taken!"}), 401
         add_degree_to_student(status.id, degree)
         add_gpa_to_student(status.id, gpa)
         return jsonify({"message": "Signup successful"}), 201
