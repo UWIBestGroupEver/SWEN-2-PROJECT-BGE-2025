@@ -26,20 +26,6 @@ students, staff & employers of companies that need a simple system to have stude
 
 ---
 
-## User commands
-
-| Command | Description | Usage | Example Usage |
-|---------|-------------|-------|---------------|
-|`flask user list`| Lists all the users in the database |
-|`flask user add_position`| Adds a new position (job opening) | flask user add_position *position name* | flask user add_position *Software Engineer* *1* *1* |
-|`flask user add_to_shortlist`| Adds a student to a position's shortlist | flask user add_to_shortlist *student_id* *position_id* *staff_id* | flask user add_to_shortlist *1* *1* *1* |
-|`flask user decide_shortlist`| Decides on a student/position shortlist entry (accepted/rejected) | flask user decide_shortlist *student_id* *position_id* *decision* | flask user decide_shortlist *1* *1* *accepted* |
-|`flask user get_shortlist`| Retrieves the shortlist entries for a student | flask user get_shortlist *student_id* | flask user get_shortlist *2* |
-|`flask user get_shortlist_by_position`| Retrieves all shortlist entries for a specific position | flask user get_shortlist_by_position *position_id* | flask user get_shortlist_by_position *3* |
-|`flask user get_position_by_employer`| Gets all positions opened by a specific employer | flask user get_positions_by_employer *employer_id* | flask user get_positions_by_employer *2* |
-
----
-
 ## Student Commands
 | Command | Description | Usage | Example Usage |
 |---------|-------------|-------|---------------|
