@@ -37,7 +37,7 @@ students, staff & employers of companies that need a simple system to have stude
 |`flask list_positions`| Lists all the positions in the database |
 |`flask list_applications`| Lists all the applications in the database |
 |`flask list_shortlist`| Lists all the shortlists in the database |
-|`flask view_approved_applications`| Lists all approved applications in the database |
+|`flask view_accepted_applications`| Lists all approved applications in the database |
 |`flask view_rejected_applications`| Lists all rejected applications in the database |
 
 ---

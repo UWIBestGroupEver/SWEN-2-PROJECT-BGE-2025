@@ -95,13 +95,16 @@ def list_shortlists():
 
 
 #command to list all approved applications
-@app.cli.command("view_approved_applications", help="Lists all approved applications in the database")
+@app.cli.command("view_accepted_applications", help="Lists all approved applications in the database")
 def view_approved_applications():
     print('\nApproved Applications:\n')
-    applications = Application.query.filter_by(status=ApplicationStatus.APPROVED).all()
+    applications = Application.query.filter_by(status=ApplicationStatus.ACCEPTED).all()
     for application in applications:
         print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    if not applications:
+        print("No approved applications found.")
     print("\n")
+
 
 
 #command to list all rejected applications
@@ -111,7 +114,9 @@ def view_rejected_applications():
     applications = Application.query.filter_by(status=ApplicationStatus.REJECTED).all()
     for application in applications:
         print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
-
+    if not applications:
+        print("No rejected applications found.")
+    print("\n")
 
 @app.cli.command("view_pending_applications", help="Lists all pending applications in the database")
 def view_pending_applications():
@@ -119,6 +124,8 @@ def view_pending_applications():
     applications = Application.query.filter_by(status=ApplicationStatus.APPLIED).all()
     for application in applications:
         print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    if not applications:
+        print("No pending applications found.")
     print("\n")
 
 ##--------------------------------------------Student Commands--------------------------------------------##
