@@ -16,9 +16,11 @@ class Student(db.Model):
     gpa = db.Column(db.Float)
     resume = db.Column(db.String(256))
 
-    def __init__(self, username, user_id):
+    def __init__(self, username, user_id,gpa=None,degree=None):
         self.username = username
         self.user_id = user_id
+        self.gpa=gpa
+        self.degree=degree
 
 #    def update_DOB(self, date):
 #        self.DOB = date

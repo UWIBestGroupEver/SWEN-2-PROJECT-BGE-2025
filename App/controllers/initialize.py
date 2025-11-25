@@ -2,7 +2,12 @@ from .user import create_user
 from .shortlist import add_student_to_shortlist
 from .position import open_position
 from .application import apply
+from .application import shortlist
+from App.models.application import Application
+from App.models.student import Student
 from App.database import db
+
+import random
 
 
 def initialize():
@@ -15,7 +20,7 @@ def initialize():
 
     positions=open_positions(employers)
     apply_students(students)
-    assign_shortlists(students,positions,staff)
+    assign_shortlist(students,positions,staff)
 
 def create_employers():
     users=[]
@@ -34,11 +39,20 @@ def create_staff():
     return users
 
 def create_students():
+    names=['george','sarah','gus','jamie','earnest']
+    gpas=[3.5,3.7,3.2,3.8,4.0]
+    degrees=['Computer Science','Mechanical Engineering','Design','Design','Database Management']
+
+    random.shuffle(gpas)
+    #random.shuffle(degrees)
+
     users=[]
-    for uname in ('george','sarah','gus','jamie','earnest'):
-        u=create_user(uname, f'{uname}pass', "student")
-        if u:
-            users.append(u)
+    for name,gpa,deg in zip(names,gpas,degrees):
+        u=create_user(name, f'{name}pass', "student",gpa=gpa,degree=deg)
+        if not u:
+            continue
+        
+        users.append(u)
     return users
 
 def open_positions(employers):
@@ -58,21 +72,35 @@ def open_positions(employers):
     return positions
 
 def apply_students(students):
-    for s in students:
-        if s:
-            try:
-                apply(student_user_id=s.id)
-            except Exception :
-                pass
+    for s in students[:2]:
+        if not s:
+            continue
+        try:
+            apply(student_user_id=s.user_id)
+        except Exception as e:
+            print(f"Error applying student {s.id}: {e}")
 
-def assign_shortlists(students,positions,staff):
-    for stdnt,pos,stf in zip(students,positions,staff):
-        if stdnt and pos and stf:
-            try:
-                add_student_to_shortlist(
-                    student_id=stdnt.id,
-                    position_id=pos.id,
-                    staff_id=stf.id
-                )
-            except Exception:
-                pass
+def assign_shortlist(students,positions,staff):
+    std=students[0]
+    pos=positions[0]
+    stf=staff[0]
+
+    app = Application.query.filter_by(student_id=std.id).order_by(Application.id.desc()).first()
+    if not app:
+        try:
+            app=apply(student_user_id=std.id)
+            if not app:
+                print(f"Could not create application for student {std.id}")
+                return
+        except Exception as e:
+            print(f"Error applying student {std.id}: {e}")
+            return
+        
+    try:
+        shortlist(
+            staff_user_id=stf.user_id,
+            application_id=app.id,
+            position_id=pos.id
+        )
+    except Exception as e:
+        print(f"Error shortlisting application {app.id}: {e}")
