@@ -2,9 +2,10 @@
 	"info": {
 		"_postman_id": "c40c5761-c825-45c6-a773-e89e73e01ceb",
 		"name": "Base_API_Tests",
+		"description": "This collection tests a simple internship platform application workflow where students apply, staff shortlist, and employers make final decisions on applications.\n\nIt covers:\n\n- Authentication flows (signup, login, logout)\n    \n- Application lifecycle: **APPLIED → SHORTLISTED → ACCEPTED / REJECTED**\n    \n- Role-based access control for **student**, **staff**, and **employer**\n    \n- Allowed and disallowed state transitions, with clear error responses\n    \n\nThe collection is organized into folders by role, and uses pre-request scripts to auto-signup + login test users so that each request can be run without manual setup.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "49380564",
-		"_collection_link": "https://anayafelixwork-4442992.postman.co/workspace/BestGroupEver_API_Testing~d8ccf9b7-20f9-47fb-ab2a-68b7d56ae1ca/collection/49380564-c40c5761-c825-45c6-a773-e89e73e01ceb?action=share&source=collection_link&creator=49380564"
+		"_collection_link": "https://anayafelixwork-4442992.postman.co/workspace/d8ccf9b7-20f9-47fb-ab2a-68b7d56ae1ca/collection/49380564-c40c5761-c825-45c6-a773-e89e73e01ceb?action=share&source=collection_link&creator=49380564"
 	},
 	"item": [
 		{
@@ -76,9 +77,65 @@
 								"api",
 								"signup"
 							]
-						}
+						},
+						"description": "StartFragmentCreates a new student account with GPA and degree.EndFragment"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Signup_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\",\r\n  \"type\": \"student\",\r\n  \"gpa\":\"3.0\",\r\n  \"degree\":\"Bsc.Computer Science\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.student.token.example\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Login_Student",
@@ -140,9 +197,60 @@
 								"api",
 								"login"
 							]
-						}
+						},
+						"description": "Authenticates a student and returns a JWT token."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Login_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.student.login.token\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Student_Apply",
@@ -205,9 +313,164 @@
 								"applications",
 								"student_apply"
 							]
-						}
+						},
+						"description": "Allows a student to submit their one permitted application"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Student_Apply",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Application submitted successfully for {student_username}. Application status: Applied\"\r\n}\r\n"
+						},
+						{
+							"name": "Student_Applies_Twice",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Student with user id 7 has already sent in an application\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only students can submit applications\"\r\n}"
+						}
+					]
 				},
 				{
 					"name": "Student_Check_My_Application_Status",
@@ -271,11 +534,146 @@
 								"applications",
 								"my"
 							]
-						}
+						},
+						"description": "Returns the current student’s application and its status."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Student_Check_My_Application_Status_APPLIED",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 1,\r\n  \"student_id\": 5,\r\n  \"status\": \"APPLIED\"\r\n}\r\n"
+						},
+						{
+							"name": "Student_Check_My_Application_Status_SHORTLISTED",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 1,\r\n  \"student_id\": 5,\r\n  \"status\": \"SHORTLISTED\",\r\n  \"position\": {\r\n    \"position_id\": 3,\r\n    \"title\": \"Software Engineering Intern\"\r\n  }\r\n}\r\n"
+						},
+						{
+							"name": "Error_No_Application_Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"No application found for this student\"\r\n}\r\n"
+						}
+					]
 				}
 			],
+			"description": "Endpoints that represent what a **student** can do in the system.\n\nThis folder focuses on:\n\n- Signing up and logging in as a student\n    \n- Submitting an application (`student_apply`)\n    \n- Checking the current status of their own application (`/api/applications/my`)\n    \n\nAll requests in this folder assume the caller has the **student** role and use the `student_token` provided by the pre-request script.EndFragment",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -430,6 +828,11 @@
 								"key": "Content-Type",
 								"value": "application/json",
 								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
 							}
 						],
 						"body": {
@@ -455,9 +858,60 @@
 								"api",
 								"signup"
 							]
-						}
+						},
+						"description": "Creates a new staff account."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Signup_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\",\r\n  \"type\": \"staff\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.staff.token.example\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Login_Staff",
@@ -519,9 +973,60 @@
 								"api",
 								"login"
 							]
-						}
+						},
+						"description": "Authenticates a staff member and returns a JWT token"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Login_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.staff.login.example\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Staff_Shortlist_Application",
@@ -580,9 +1085,197 @@
 								"3",
 								"shortlist"
 							]
-						}
+						},
+						"description": "Moves an application from APPLIED → SHORTLISTED for a given position"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Staff_Shortlist_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Student with user id 7 shortlisted successfully to shortlist 4\"\r\n}\r\n"
+						},
+						{
+							"name": "Staff_Application_Already_Shortlisted",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in APPLIED status\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only staff can shortlist applications\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Shortlist_On_Non_Applied_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in APPLIED status\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Staff_View_Applications",
@@ -647,9 +1340,61 @@
 								"applications",
 								"all_applications"
 							]
-						}
+						},
+						"description": "Returns a list of all applications in the system"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Staff_View_Applications",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/all_applications",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"all_applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 1,\r\n    \"student_id\": 5,\r\n    \"status\": \"APPLIED\"\r\n  },\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\"\r\n  },\r\n  {\r\n    \"application_id\": 3,\r\n    \"student_id\": 7,\r\n    \"status\": \"ACCEPTED\"\r\n  }\r\n]\r\n"
+						}
+					]
 				},
 				{
 					"name": "Staff_Get_Application_by_Status",
@@ -713,9 +1458,53 @@
 								"status",
 								"SHORTLISTED"
 							]
-						}
+						},
+						"description": "Returns applications filtered by a specific application status"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Staff_Get_Application_by_Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/status/SHORTLISTED",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"status",
+										"SHORTLISTED"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\",\r\n    \"position\": {\r\n      \"position_id\": 3,\r\n      \"title\": \"Software Engineering Intern\"\r\n    }\r\n  }\r\n]\r\n"
+						}
+					]
 				},
 				{
 					"name": "Check_Application_Status",
@@ -788,11 +1577,110 @@
 								"applications",
 								"3"
 							]
-						}
+						},
+						"description": "Fetches the full details of a specific application by ID."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Check_Application_Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 3,\r\n  \"student_id\": 7,\r\n  \"status\": \"ACCEPTED\",\r\n  \"position\": {\r\n    \"position_id\": 3,\r\n    \"title\": \"Software Engineering Intern\"\r\n  }\r\n}\r\n"
+						},
+						{
+							"name": "Error_Application_Not_Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application not found\"\r\n}\r\n"
+						}
+					]
 				}
 			],
+			"description": "This folder focuses on staff responsibilities in the workflow:\n\n- Viewing all applications (`/api/applications/all_applications`)\n    \n- Shortlisting applications (`/api/applications/:id/shortlist`)\n    \n- Filtering applications by status (`/api/applications/status/:status_name`)\n    \n\nAll requests in this folder assume the caller has the **staff** role and use the `staff_token` from the pre-request script.",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -975,9 +1863,65 @@
 								"api",
 								"signup"
 							]
-						}
+						},
+						"description": "Creates a new employer account"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Signup_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\",\r\n  \"type\": \"employer\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.employer.token.example\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Login_Employer",
@@ -1039,9 +1983,60 @@
 								"api",
 								"login"
 							]
-						}
+						},
+						"description": "Authenticates an employer and returns a JWT token"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Login_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.employer.login.token\"\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Employer_Create_Position",
@@ -1103,9 +2098,61 @@
 								"openings",
 								"1"
 							]
-						}
+						},
+						"description": "Creates a new position opening for the logged-in employer"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Employer_Create_Position",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Software Engineering Intern\",\r\n  \"number\": 3\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/1",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"1"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Job opening created successfully\",\r\n  \"opening_id\": 1\r\n}\r\n"
+						}
+					]
 				},
 				{
 					"name": "Employer_Decide",
@@ -1169,9 +2216,314 @@
 								"3",
 								"decision"
 							]
-						}
+						},
+						"description": "Allows an employer to move a shortlisted application to ACCEPTED or REJECTED"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Employer_Decide_Accept",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Application 2 has been accepted.\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Invalid_Decision_Value",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Decision must be either 'ACCEPTED' or 'REJECTED'\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only employers can make decisions on applications\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Application_Not_Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application not found\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Decide_On_Non_Shortlisted_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in SHORTLISTED status\"\r\n}\r\n"
+						},
+						{
+							"name": "Employer_Decide_Reject",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application 2 has been rejected.\"\r\n}"
+						}
+					]
 				},
 				{
 					"name": "Employer_View_My_Openings",
@@ -1241,9 +2593,57 @@
 								"openings",
 								"my"
 							]
-						}
+						},
+						"description": "Lists all job openings created by the current employer"
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Employer_View_My_Openings",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"position_id\": 1,\r\n    \"title\": \"Software Engineering Intern\",\r\n    \"number_of_positions\": 3,\r\n    \"employer_id\": 10\r\n  },\r\n  {\r\n    \"position_id\": 2,\r\n    \"title\": \"Data Analyst Intern\",\r\n    \"number_of_positions\": 2,\r\n    \"employer_id\": 10\r\n  }\r\n]\r\n"
+						}
+					]
 				},
 				{
 					"name": "Employer_View_Shortlisted_Per_Position",
@@ -1311,11 +2711,61 @@
 								"10",
 								"applications"
 							]
-						}
+						},
+						"description": "Returns applications shortlisted to a specific position owned by the employer."
 					},
-					"response": []
+					"response": [
+						{
+							"name": "Employer_View_Shortlisted_Per_Position",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/10/applications",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"10",
+										"applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\"\r\n  },\r\n  {\r\n    \"application_id\": 3,\r\n    \"student_id\": 7,\r\n    \"status\": \"ACCEPTED\"\r\n  }\r\n]\r\n"
+						}
+					]
 				}
 			],
+			"description": "StartFragment\n\nThis folder focuses on the employer side of the process:\n\n- Creating position openings (`/api/openings/:id`)\n    \n- Listing their own openings (`/api/openings/my`)\n    \n- Viewing applications shortlisted to a specific opening (`/api/openings/:position_id/applications`)\n    \n- Making final decisions on applications (`/api/applications/:id/decision`) – moving from **SHORTLISTED → ACCEPTED/REJECTED**\n    \n\nAll requests in this folder assume the caller has the **employer** role and use the `employer_token` provided by the pre-request script.  \n  \n\nEndFragment",
 			"event": [
 				{
 					"listen": "prerequest",
@@ -1487,9 +2937,55 @@
 						"api",
 						"identify"
 					]
-				}
+				},
+				"description": "Shows the currently authenticated user via JWT"
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Identify_User",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/identify",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"identify"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"message\": \"username: student5, id : 8\"\r\n}\r\n"
+				}
+			]
 		},
 		{
 			"name": "Health",
@@ -1533,12 +3029,48 @@
 						"applications",
 						"ping"
 					]
-				}
+				},
+				"description": "Simple health check returning \"pong.\""
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Health",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/ping",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"ping"
+							]
+						}
+					},
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"status\": \"ok\",\r\n  \"message\": \"pong\"\r\n}\r\n"
+				}
+			]
 		},
 		{
-			"name": "Login Copy",
+			"name": "Login",
 			"event": [
 				{
 					"listen": "test",
@@ -1592,9 +3124,55 @@
 						"api",
 						"login"
 					]
-				}
+				},
+				"description": "General Login for any user type (Staff/Student/Employer)"
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.login.copy.token\"\r\n}\r\n"
+				}
+			]
 		},
 		{
 			"name": "Logout",
@@ -1649,9 +3227,55 @@
 						"api",
 						"logout"
 					]
-				}
+				},
+				"description": "Clears JWT cookies and logs out the current user."
 			},
-			"response": []
+			"response": [
+				{
+					"name": "Logout",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"message\": \"Logged Out!\"\r\n}\r\n"
+				}
+			]
 		}
 	]
 }
