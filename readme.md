@@ -90,3 +90,44 @@ If changes are made to the models, the database must be 'migrated' to be synced 
 `flask db migrate`
 `flask db upgrade`
 `flask db --help`
+
+## API Usage
+
+### Application Endpoints AND Sample cURL / postman commands
+----------------------------------------------------------------------------
+|           Endpoint      |                Sample Command                  |
+|-------------------------|----------------------------------------------- |
+| Health check:           |  {{base_url}}/api/applications/ping            |
+| Student application:    |  {{base_url}}/api/applications/student_apply   |
+| View All Applications:  |  {{base_url}}/api/applications/all_applications|
+| Get application:        |  {{base_url}}/api/applications/{id}            |
+| Shortlist application:  |  {{base_url}}/api/applications/{id}/shortlist  |
+| Application decision:   |  {{base_url}}/api/applications/{id}/decision   |
+| Updated Signup:         |  {{base_url}}/api/signup                       |
+| Opening creation:       |  {{base_url}}/api/openings/{id}                |
+| View all openings:      |  {{base_url}}/api/openings                     |
+----------------------------------------------------------------------------
+
+### Extra Application Endpoints AND Sample cURL / postman commands
+-----------------------------------------------------------------------------------------
+|           Endpoint              |                Sample Command                       |
+|---------------------------------|-----------------------------------------------------|
+| Get student user's application: |  {{base_url}}/api/applications/my                   |
+| Get application status:         |  {{base_url}}/api/applications/status/{status_name} |
+-----------------------------------------------------------------------------------------
+
+### Extra Openings Endpoints AND Sample cURL / postman commands
+-----------------------------------------------------------------------------------------
+|           Endpoint              |                Sample Command                       |
+|---------------------------------|-----------------------------------------------------|
+| Get employer user's openings:   |  {{base_url}}/api/openings/my                       |
+| Get applications for an opening:|  {{base_url}}/api/openings/{id}/applications        |
+-----------------------------------------------------------------------------------------
+
+
+### Testing Instructions
+* Initialize the database 
+* Take the base url of the running application 
+* Open postman
+* Import the collection 
+* Run the tests
