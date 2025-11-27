@@ -1,7 +1,7 @@
 from App.models import User, Student, Employer, Staff
 from App.database import db
 
-def create_user(username, password, user_type):
+def create_user(username, password, user_type,degree=None,gpa=None):
     try:
         newuser = User(username=username, password=password, role=user_type)
         db.session.add(newuser)
@@ -10,7 +10,7 @@ def create_user(username, password, user_type):
         student = employer = staff = None
 
         if user_type == "student":
-            student = Student(username=username, user_id=newuser.id)
+            student = Student(username=username, user_id=newuser.id,degree=degree,gpa=gpa)
             db.session.add(student)
         elif user_type == "employer":
             employer = Employer(username=username, user_id=newuser.id)

@@ -14,7 +14,7 @@ from App.models.shortlist import DecisionStatus
 
 
 # This commands file allow you to create convenient CLI commands for testing controllers
-
+#--------------------------------------------App Commands--------------------------------------------##
 app = create_app()
 migrate = get_migrate(app)
 
@@ -24,134 +24,109 @@ def init():
     initialize()
     print('database intialized')
 
-'''
-User Commands
-'''
+#command to list all users
+@app.cli.command("list_users", help="Lists all users in the database")
+def list_users():
+    print('\nUsers:\n')
+    users = User.query.all()
+    for user in users:
+        print(f'UserID: {user.id}, Username: {user.username}, Role: {user.role}')
+    print("\n")
 
-# # Commands can be organized using groups
 
-# # create a group, it would be the first argument of the comand
-# # eg : flask user <command>
-# user_cli = AppGroup('user', help='User object commands') 
+#command to list all students
+@app.cli.command("list_students", help="Lists all students in the database")
+def list_students():
+    print('\nStudents:\n')
+    students = Student.query.all()
+    for student in students:
+        print(f'UserID: {student.user_id}, Username: {student.username}, GPA: {student.gpa}, Degree: {student.degree}')
+    print("\n")
 
-# # Then define the command and any parameters and annotate it with the group (@)
-# @user_cli.command("create", help="Creates a user")
-# @click.argument("username", default="rob")
-# @click.argument("password", default="robpass")
-# @click.argument("user_type", default="student")
-# def create_user_command(username, password, user_type):
-#     result = create_user(username, password, user_type)
-#     # `create_user` now returns the created User object on success, or False on failure
-#     if result:
-#         try:
-#             print(f'{username} created with id {result.id}!')
-#         except Exception:
-#             # fallback if a truthy non-user value is returned
-#             print(f'{username} created!')
-#     else:
-#         print("User creation failed")
 
-# # this command will be : flask user create bob bobpass
+#command to list all employers
+@app.cli.command("list_employers", help="Lists all employers in the database")
+def list_employers():
+    print('\nEmployers:\n')
+    employers = Employer.query.all()
+    for employer in employers:
+        print(f'UserID: {employer.user_id}, Username: {employer.username}')
+    print("\n")
 
-# @user_cli.command("list", help="Lists users in the database")
-# @click.argument("format", default="string")
-# def list_user_command(format):
-#     if format == 'string':
-#         print(get_all_users())
-#     else:
-#         print(get_all_users_json())
 
-# @user_cli.command("add_position", help="Adds a position")
-# @click.argument("title", default="Software Engineer")
-# @click.argument("employer_id", default=1)
-# @click.argument("number", default=1)
-# def add_position_command(title, employer_id, number):
-#     position = open_position(title, employer_id, number)
-#     if position:
-#         print(f'{title} created!')
-#     else:
-#         print(f'Employer {employer_id} does not exist')
+#command to list all staff
+@app.cli.command("list_staff", help="Lists all staff in the database")
+def list_staff():
+    print('\nStaff:\n')
+    staff_members = Staff.query.all()
+    for staff in staff_members:
+        print(f'UserID: {staff.user_id}, Username: {staff.username}')
+    print("\n")
 
-# @user_cli.command("add_to_shortlist", help="Adds a student to a shortlist")
-# @click.argument("student_id", default=1)
-# @click.argument("position_id", default=1)
-# @click.argument("staff_id", default=1)
-# def add_to_shortlist_command(student_id, position_id, staff_id):
-#     test = add_student_to_shortlist(student_id, position_id, staff_id)
-#     if test:
-#         print(f'Student {student_id} added to shortlist for position {position_id}')
-#         print("\n\n__________________________________________________________________________\n\n")
-#     else:
-#         print('One of the following is the issue:')
-#         print(f'    Position {position_id} is not open')
-#         print(f'    Student {student_id} already in shortlist for position {position_id}')
-#         print(f'    There is no more open slots for position {position_id}')
-#         print("\n\n__________________________________________________________________________\n\n")
 
-# @user_cli.command("decide_shortlist", help="Decides on a shortlist")
-# @click.argument("student_id", default=1)
-# @click.argument("position_id", default=1)
-# @click.argument("decision", default="accepted")
-# def decide_shortlist_command(student_id, position_id, decision):
-#     test = decide_shortlist(student_id, position_id, decision)
-#     if test:
-#         print(f'Student {student_id} is {decision} for position {position_id}')
-#         print("\n\n__________________________________________________________________________\n\n")
-#     else:
-#         print(f'Student {student_id} not in shortlist for position {position_id}')
-#         print("\n\n__________________________________________________________________________\n\n")
+#command to list all positions
+@app.cli.command("list_positions", help="Lists all positions in the database")
+def list_positions():
+    print('\nPositions:\n')
+    positions = Position.query.all()
+    for position in positions:
+        print(f'PositionID: {position.id}, Title: {position.title}, Number of Positions: {position.number_of_positions}, Status: {position.status.value}, EmployerID: {position.employer_id}')
+    print("\n")
 
-# @user_cli.command("get_shortlist", help="Gets a shortlist for a student")
-# @click.argument("student_id", default=1)
-# def get_shortlist_command(student_id):
-#     list = get_shortlist_by_student(student_id)
-#     if list:
-#         for item in list:
-#             print(f'Student {item.student_id} is {item.status.value} for position {item.position_id}')
 
-#         print("\n\n__________________________________________________________________________\n\n")
-#     else:
-#         print(f'Student {student_id} has no shortlists')
-#         print("\n\n__________________________________________________________________________\n\n")
+#command to list all applications
+@app.cli.command("list_applications", help="Lists all applications in the database")
+def list_applications():
+    print('\nApplications:\n')
+    applications = Application.query.all()
+    for application in applications:
+        print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    print("\n")
 
-# @user_cli.command("get_shortlist_by_position", help="Gets a shortlist for a position")
-# @click.argument("position_id", default=1)
-# def get_shortlist_by_position_command(position_id):
-#     list = get_shortlist_by_position(position_id)
-#     if list:
-#         for item in list:
-#             print(f'Student {item.student_id} is {item.status.value} for {item.position.title} id: {item.position_id}')
-#             print(f'    Staff {item.staff_id} added this student to the shortlist')
-#             print(f'    Position {item.position_id} is {item.position.status.value}')
-#             print(f'    Position {item.position_id} has {item.position.number_of_positions} slots')
-#             print(f'    Position {item.position_id} is for {item.position.title}')
-#             print("\n\n__________________________________________________________________________\n\n")
 
-#     else:
-#         print(f'Position {position_id} has no shortlists')
-#         print("\n\n__________________________________________________________________________\n\n")
+#command to list all shortlists
+@app.cli.command("list_shortlist", help="Lists all shortlists in the database")
+def list_shortlists():
+    print('\nShortlisted Applications:\n')
+    shortlists = Shortlist.query.all()
+    for shortlist in shortlists:
+        print(f'ShortlistID: {shortlist.id}, ApplicationID: {shortlist.application_id}, PositionID: {shortlist.position_id}, StaffID: {shortlist.staff.user_id if shortlist.staff else "Unknown"}, Status: {shortlist.status.value}')
+    print("\n")
 
-# @user_cli.command("get_positions_by_employer", help="Gets all positions for an employer")
-# @click.argument("employer_id", default=1)
-# def get_positions_by_employer_command(employer_id):
-#     list = get_positions_by_employer(employer_id)
-#     if list:
-#         for item in list:
-#             print(f'Position {item.id} is {item.status.value}')
-#             print(f'    Position {item.id} has {item.number_of_positions} slots')
-#             print(f'    Position {item.id} is for {item.title}')
-#             print("\n\n__________________________________________________________________________\n\n")
-#     else:
-#             print(f'Employer {employer_id} has no positions')
-#             print("\n\n__________________________________________________________________________\n\n")
-            
-# app.cli.add_command(user_cli) # add the group to the cli
+
+#command to list all approved applications
+@app.cli.command("view_accepted_applications", help="Lists all approved applications in the database")
+def view_approved_applications():
+    print('\nApproved Applications:\n')
+    applications = Application.query.filter_by(status=ApplicationStatus.ACCEPTED).all()
+    for application in applications:
+        print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    if not applications:
+        print("No approved applications found.")
+    print("\n")
 
 
 
+#command to list all rejected applications
+@app.cli.command("view_rejected_applications", help="Lists all rejected applications in the database")
+def view_rejected_applications():
+    print('\nRejected Applications:\n')
+    applications = Application.query.filter_by(status=ApplicationStatus.REJECTED).all()
+    for application in applications:
+        print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    if not applications:
+        print("No rejected applications found.")
+    print("\n")
 
-##==========================================================================================================================================##
-
+@app.cli.command("view_pending_applications", help="Lists all pending applications in the database")
+def view_pending_applications():
+    print("\nPending Applications:\n")
+    applications = Application.query.filter_by(status=ApplicationStatus.APPLIED).all()
+    for application in applications:
+        print(f'ApplicationID: {application.id}, StudentID: {application.student.user_id if application.student else "Unknown"}, Status: {application.status.value}')
+    if not applications:
+        print("No pending applications found.")
+    print("\n")
 
 ##--------------------------------------------Student Commands--------------------------------------------##
 
@@ -195,7 +170,7 @@ def apply_command():
     except PermissionError as e:
         print(str(e))
 
-@student_cli.command("applicationStatus", help="Get the status of an application")
+@student_cli.command("application_status", help="Get the status of an application")
 def application_status_command():
     application_id = input("Enter application ID: ")
     application = Application.query.get(application_id)
@@ -233,6 +208,11 @@ def shortlist_command():
     print("\n")
     staff_id = input("Please Enter staff userID: ")
 
+    # Check if staff exists
+    if not Staff.query.filter_by(user_id=staff_id).first():
+        print(f"Only Staff members can shortlist applications. No staff found with user ID {staff_id}.")
+        return
+    
     # Only show applications that are in the APPLIED state
     apps = Application.query.filter_by(status=ApplicationStatus.APPLIED).order_by(Application.id).all()
     if not apps:
@@ -295,7 +275,7 @@ def create_employer_command():
         print("Employer creation failed")
 
 
-@employer_cli.command("openPosition", help="Employer opens a position")
+@employer_cli.command("open_position", help="Employer opens a position")
 def open_position_command():
     employer_id = input("Enter employer userID: ")
     
@@ -314,8 +294,8 @@ def open_position_command():
 
 
 
-@employer_cli.command("decide", help="Employer accepts an application")
-def accept_application_command():
+@employer_cli.command("decide", help="Employer accepts or denies an application")
+def decide_application_command():
     employer_id = input("Enter employer ID: ")
     
     # Retrieve the employer
@@ -371,41 +351,36 @@ def accept_application_command():
 app.cli.add_command(employer_cli) # add the group to the cli
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 '''
 Test Commands
 '''
 
 test = AppGroup('test', help='Testing commands') 
 
-@test.command("user", help="Run User tests")
-@click.argument("type", default="all")
-def user_tests_command(type):
-    if type == "unit":
-        sys.exit(pytest.main(["-k", "UserUnitTests"]))
-    elif type == "int":
-        sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
-    else:
-        sys.exit(pytest.main(["-k", "App"]))
-    
+@test.command("all", help="Run all tests")
+def all_tests_command():
+    """Run all unit and integration tests"""
+    sys.exit(pytest.main([
+        "App/tests/unit_controller_tests.py",
+        "App/tests/unit_model_tests.py", 
+        "App/tests/integration_tests.py",
+        "-v"
+    ]))
+
+@test.command("unitcontroller", help="Run all controller tests")
+def controller_tests_command():
+    """Run unit controller tests only"""
+    sys.exit(pytest.main(["App/tests/unit_controller_tests.py", "-v"]))
+
+@test.command("unitmodel", help="Run all model tests")
+def model_tests_command():
+    """Run unit model tests only"""
+    sys.exit(pytest.main(["App/tests/unit_model_tests.py", "-v"]))
+
+@test.command("integration", help="Run integration tests")
+def integration_tests_command():
+    """Run integration tests only"""
+    sys.exit(pytest.main(["App/tests/integration_tests.py", "-v"]))
+
 
 app.cli.add_command(test)
