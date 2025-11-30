@@ -21,16 +21,3 @@ class Student(db.Model):
         self.user_id = user_id
         self.gpa=gpa
         self.degree=degree
-
-#    def update_DOB(self, date):
-#        self.DOB = date
-#        db.session.commit()
-#        return self.DOB
-#        
-#   @hybrid_property
-#   def age(self):
-#       if self.DOB is None:
-#           return None
-#       today = date.today()
-#       dob = self.DOB
-#       return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))

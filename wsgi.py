@@ -6,7 +6,7 @@ from App.models import User, Position, Student, Employer, Staff, Application, Sh
 from App.models.application_status import ApplicationStatus
 from App.models.position import PositionStatus
 from App.main import create_app
-from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize, open_position, add_student_to_shortlist, decide_shortlist, get_shortlist_by_student, get_shortlist_by_position, get_positions_by_employer)
+from App.controllers import ( create_user, get_all_users_json, get_all_users, initialize, open_position, get_positions_by_employer)
 from App.controllers.application import (apply, shortlist, decide)
 from App.controllers.student import add_gpa_to_student, add_degree_to_student, create_student
 from App.controllers.user import get_user

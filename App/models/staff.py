@@ -12,8 +12,3 @@ class Staff(db.Model):
         self.username = username
         self.user_id = user_id
 
-    '''def add_to_shortlist(self, student_id, position_id):
-        shortlist = Shortlist(student_id=student_id, position_id=position_id, staff_id=self.id)
-        db.session.add(shortlist)
-        db.session.commit()
-        return shortlist'''

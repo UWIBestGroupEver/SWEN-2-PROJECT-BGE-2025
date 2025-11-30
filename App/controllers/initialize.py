@@ -1,5 +1,4 @@
 from .user import create_user
-from .shortlist import add_student_to_shortlist
 from .position import open_position
 from .application import apply, shortlist, decide
 from App.models.application import Application
