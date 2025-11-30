@@ -16,19 +16,8 @@ class Student(db.Model):
     gpa = db.Column(db.Float)
     resume = db.Column(db.String(256))
 
-    def __init__(self, username, user_id):
+    def __init__(self, username, user_id,gpa=None,degree=None):
         self.username = username
         self.user_id = user_id
-
-#    def update_DOB(self, date):
-#        self.DOB = date
-#        db.session.commit()
-#        return self.DOB
-#        
-#   @hybrid_property
-#   def age(self):
-#       if self.DOB is None:
-#           return None
-#       today = date.today()
-#       dob = self.DOB
-#       return today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+        self.gpa=gpa
+        self.degree=degree

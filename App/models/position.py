@@ -20,7 +20,16 @@ class Position(db.Model):
         self.employer_id = employer_id
         self.status = "open"
         self.number_of_positions = number
-        
+    
+    @property
+    def number(self):
+        """Backward compatibility property for accessing number_of_positions."""
+        return self.number_of_positions
+    
+    @number.setter
+    def number(self, value):
+        """Backward compatibility setter for number_of_positions."""
+        self.number_of_positions = value
 
     def update_status(self, status):
         self.status = status

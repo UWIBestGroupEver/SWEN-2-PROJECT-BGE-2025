@@ -1,14 +1,16 @@
 from App.models import User, Student, Employer, Staff
 from App.database import db
 
-def create_user(username, password, user_type):
+def create_user(username, password, user_type,degree=None,gpa=None):
     try:
         newuser = User(username=username, password=password, role=user_type)
         db.session.add(newuser)
         db.session.flush() 
         
+        student = employer = staff = None
+
         if user_type == "student":
-            student = Student(username=username, user_id=newuser.id)
+            student = Student(username=username, user_id=newuser.id,degree=degree,gpa=gpa)
             db.session.add(student)
         elif user_type == "employer":
             employer = Employer(username=username, user_id=newuser.id)
@@ -20,8 +22,18 @@ def create_user(username, password, user_type):
             return False
         
         db.session.commit()
-        return True
+
+        if user_type == "student":
+            return student
+        if user_type == "employer":
+            return employer
+        if user_type == "staff":
+            return staff
+
+        return newuser
+
     except Exception as e:
+        print("create_user error:", e)
         db.session.rollback()
         return False
 

@@ -1,11 +1,11 @@
 from App.models import Position, Employer
 from App.database import db
 
-def open_position(user_id, title, number_of_positions=1):
+def open_position(title,user_id, number_of_positions=1):
     employer = Employer.query.filter_by(user_id=user_id).first()
     if not employer:
-        return None
-    
+        return False
+
     new_position = Position(title=title, number=number_of_positions, employer_id=employer.id)
     db.session.add(new_position)
     try:
@@ -13,7 +13,7 @@ def open_position(user_id, title, number_of_positions=1):
         return new_position
     except Exception as e:
         db.session.rollback()
-        return None
+        return False
 
 
 def get_positions_by_employer(user_id):
@@ -32,3 +32,11 @@ def get_positions_by_employer_json(user_id):
     if positions:
         return [position.toJSON() for position in positions]
     return []
+
+def decrement_position_number(position_id):
+    position = Position.query.get(position_id)
+    if position and position.number > 0:
+        position.number -= 1
+        db.session.commit()
+        return position.number
+    return None

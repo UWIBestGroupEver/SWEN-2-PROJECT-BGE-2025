@@ -1,0 +1,3281 @@
+{
+	"info": {
+		"_postman_id": "c40c5761-c825-45c6-a773-e89e73e01ceb",
+		"name": "Base_API_Tests",
+		"description": "This collection tests a simple internship platform application workflow where students apply, staff shortlist, and employers make final decisions on applications.\n\nIt covers:\n\n- Authentication flows (signup, login, logout)\n    \n- Application lifecycle: **APPLIED → SHORTLISTED → ACCEPTED / REJECTED**\n    \n- Role-based access control for **student**, **staff**, and **employer**\n    \n- Allowed and disallowed state transitions, with clear error responses\n    \n\nThe collection is organized into folders by role, and uses pre-request scripts to auto-signup + login test users so that each request can be run without manual setup.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "49380564",
+		"_collection_link": "https://anayafelixwork-4442992.postman.co/workspace/d8ccf9b7-20f9-47fb-ab2a-68b7d56ae1ca/collection/49380564-c40c5761-c825-45c6-a773-e89e73e01ceb?action=share&source=collection_link&creator=49380564"
+	},
+	"item": [
+		{
+			"name": "Student_Tests",
+			"item": [
+				{
+					"name": "Signup_Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Student signup returns expected status\", function () {\r",
+									"    pm.expect([200, 400, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Student signup response has expected fields\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        // store for later requests\r",
+									"        pm.environment.set(\"student_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\",\r\n  \"type\": \"student\",\r\n  \"gpa\":\"3.0\",\r\n  \"degree\":\"Bsc.Computer Science\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/signup",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"signup"
+							]
+						},
+						"description": "StartFragmentCreates a new student account with GPA and degree.EndFragment"
+					},
+					"response": [
+						{
+							"name": "Signup_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\",\r\n  \"type\": \"student\",\r\n  \"gpa\":\"3.0\",\r\n  \"degree\":\"Bsc.Computer Science\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.student.token.example\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Login_Student",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login returns 200 or 401\", function () {\r",
+									"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Login response has token or error message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        pm.environment.set(\"login_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Authenticates a student and returns a JWT token."
+					},
+					"response": [
+						{
+							"name": "Login_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.student.login.token\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Student_Apply",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Student apply returns expected status\", function () {\r",
+									"    pm.expect([201, 400, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Student apply response has message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000 ",
+							"path": [
+								"api",
+								"applications",
+								"student_apply"
+							]
+						},
+						"description": "Allows a student to submit their one permitted application"
+					},
+					"response": [
+						{
+							"name": "Student_Apply",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Application submitted successfully for {student_username}. Application status: Applied\"\r\n}\r\n"
+						},
+						{
+							"name": "Student_Applies_Twice",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Student with user id 7 has already sent in an application\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Student",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000 /api/applications/student_apply",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000 ",
+									"path": [
+										"api",
+										"applications",
+										"student_apply"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only students can submit applications\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Student_Check_My_Application_Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Student my-application returns appropriate status\", function () {\r",
+									"    pm.expect([200, 403, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"My application payload is valid\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"application_id\");\r",
+									"        pm.expect(json).to.have.property(\"student_id\");\r",
+									"        pm.expect(json).to.have.property(\"status\");\r",
+									"        pm.environment.set(\"my_application_status\", json.status);\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Error response has message\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{student_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/my",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"my"
+							]
+						},
+						"description": "Returns the current student’s application and its status."
+					},
+					"response": [
+						{
+							"name": "Student_Check_My_Application_Status_APPLIED",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 1,\r\n  \"student_id\": 5,\r\n  \"status\": \"APPLIED\"\r\n}\r\n"
+						},
+						{
+							"name": "Student_Check_My_Application_Status_SHORTLISTED",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 1,\r\n  \"student_id\": 5,\r\n  \"status\": \"SHORTLISTED\",\r\n  \"position\": {\r\n    \"position_id\": 3,\r\n    \"title\": \"Software Engineering Intern\"\r\n  }\r\n}\r\n"
+						},
+						{
+							"name": "Error_No_Application_Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{student_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"my"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"No application found for this student\"\r\n}\r\n"
+						}
+					]
+				}
+			],
+			"description": "Endpoints that represent what a **student** can do in the system.\n\nThis folder focuses on:\n\n- Signing up and logging in as a student\n    \n- Submitting an application (`student_apply`)\n    \n- Checking the current status of their own application (`/api/applications/my`)\n    \n\nAll requests in this folder assume the caller has the **student** role and use the `student_token` provided by the pre-request script.EndFragment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							"// =============================\r",
+							"// Student Auto Signup + Login\r",
+							"// =============================\r",
+							"\r",
+							"// If we already have a token, don't do anything\r",
+							"if (pm.environment.get(\"student_token\")) {\r",
+							"    console.log(\"student_token already present\");\r",
+							"    return;\r",
+							"}\r",
+							"\r",
+							"const baseUrl = pm.environment.get(\"base_url\") || \"http://localhost:5000\";\r",
+							"const studentCredentials = {\r",
+							"    username: \"student1\",\r",
+							"    password: \"test123\"\r",
+							"};\r",
+							"\r",
+							"// Helper: log in student and set token\r",
+							"function loginStudent() {\r",
+							"    console.log(\"Attempting student login...\");\r",
+							"\r",
+							"    const loginRequest = {\r",
+							"        url: baseUrl + \"/api/login\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify(studentCredentials)\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(loginRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Login error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code === 200) {\r",
+							"            const data = res.json();\r",
+							"            if (!data.access_token) {\r",
+							"                console.error(\"Login succeeded but no access_token in response\");\r",
+							"                return;\r",
+							"            }\r",
+							"            pm.environment.set(\"student_token\", data.access_token);\r",
+							"            console.log(\"student_token set from login\");\r",
+							"        } else if (res.code === 401) {\r",
+							"            console.log(\"Student login failed with 401 – trying signup...\");\r",
+							"            signupStudentAndLogin();\r",
+							"        } else {\r",
+							"            console.error(\"Login failed with status\", res.code, res.json());\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Helper: sign up student, then log in\r",
+							"function signupStudentAndLogin() {\r",
+							"    console.log(\"Signing up test student user...\");\r",
+							"\r",
+							"    const signupRequest = {\r",
+							"        url: baseUrl + \"/api/signup\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                username: studentCredentials.username,\r",
+							"                password: studentCredentials.password,\r",
+							"                type: \"student\",\r",
+							"                gpa: 4.0,               // required by your API\r",
+							"                degree: \"BSc Computer Science\"\r",
+							"            })\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(signupRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Signup error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code !== 200) {\r",
+							"            console.error(\"Signup failed with status\", res.code, res.json());\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        console.log(\"Student signup successful, logging in...\");\r",
+							"        loginStudent();\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Start by trying to log in\r",
+							"loginStudent();\r",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Staff_Tests",
+			"item": [
+				{
+					"name": "Signup_Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Staff signup returns expected status\", function () {\r",
+									"    pm.expect([200, 400, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Staff signup response has expected fields\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        pm.environment.set(\"staff_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\",\r\n  \"type\": \"staff\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/signup",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"signup"
+							]
+						},
+						"description": "Creates a new staff account."
+					},
+					"response": [
+						{
+							"name": "Signup_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\",\r\n  \"type\": \"staff\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.staff.token.example\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Login_Staff",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login returns 200 or 401\", function () {\r",
+									"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Login response has token or error message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        pm.environment.set(\"login_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Authenticates a staff member and returns a JWT token"
+					},
+					"response": [
+						{
+							"name": "Login_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"mendez\",\r\n  \"password\": \"men123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.staff.login.example\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Staff_Shortlist_Application",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Shortlist status is valid\", function () {\r",
+									"    pm.expect([201, 400, 403, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Shortlist response has message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"3",
+								"shortlist"
+							]
+						},
+						"description": "Moves an application from APPLIED → SHORTLISTED for a given position"
+					},
+					"response": [
+						{
+							"name": "Staff_Shortlist_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Student with user id 7 shortlisted successfully to shortlist 4\"\r\n}\r\n"
+						},
+						{
+							"name": "Staff_Application_Already_Shortlisted",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in APPLIED status\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Staff",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only staff can shortlist applications\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Shortlist_On_Non_Applied_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"position_id\": 1\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/shortlist",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"shortlist"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in APPLIED status\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Staff_View_Applications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"View applications status is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Applications list is an array and maybe store first id\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.be.an(\"array\");\r",
+									"    if (json.length > 0) {\r",
+									"        pm.expect(json[0]).to.have.property(\"application_id\");\r",
+									"        pm.environment.set(\"application_id\", json[0].application_id.toString());\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/all_applications",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"all_applications"
+							]
+						},
+						"description": "Returns a list of all applications in the system"
+					},
+					"response": [
+						{
+							"name": "Staff_View_Applications",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/all_applications",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"all_applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 1,\r\n    \"student_id\": 5,\r\n    \"status\": \"APPLIED\"\r\n  },\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\"\r\n  },\r\n  {\r\n    \"application_id\": 3,\r\n    \"student_id\": 7,\r\n    \"status\": \"ACCEPTED\"\r\n  }\r\n]\r\n"
+						}
+					]
+				},
+				{
+					"name": "Staff_Get_Application_by_Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status filter returns valid status code\", function () {\r",
+									"    pm.expect([200, 400, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Filtered applications all have correct status\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        const requestedStatus = pm.request.url.path.slice(-1)[0].toUpperCase();\r",
+									"        pm.expect(json).to.be.an(\"array\");\r",
+									"        if (json.length > 0) {\r",
+									"            json.forEach(app => {\r",
+									"                pm.expect(app).to.have.property(\"status\");\r",
+									"                pm.expect(app.status).to.eql(requestedStatus);\r",
+									"            });\r",
+									"        }\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Error response has message\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/status/SHORTLISTED",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"status",
+								"SHORTLISTED"
+							]
+						},
+						"description": "Returns applications filtered by a specific application status"
+					},
+					"response": [
+						{
+							"name": "Staff_Get_Application_by_Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/status/SHORTLISTED",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"status",
+										"SHORTLISTED"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\",\r\n    \"position\": {\r\n      \"position_id\": 3,\r\n      \"title\": \"Software Engineering Intern\"\r\n    }\r\n  }\r\n]\r\n"
+						}
+					]
+				},
+				{
+					"name": "Check_Application_Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Application status returns 200 or 404\", function () {\r",
+									"    pm.expect([200, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Application payload has basic fields\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"application_id\");\r",
+									"        pm.expect(json).to.have.property(\"student_id\");\r",
+									"        pm.expect(json).to.have.property(\"status\");\r",
+									"        pm.expect([\"APPLIED\", \"SHORTLISTED\", \"ACCEPTED\", \"REJECTED\"])\r",
+									"          .to.include(json.status);\r",
+									"    });\r",
+									"} else if (pm.response.code === 404) {\r",
+									"    pm.test(\"404 has message\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"message\", \"Application not found\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{staff_token}}",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/3",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"3"
+							]
+						},
+						"description": "Fetches the full details of a specific application by ID."
+					},
+					"response": [
+						{
+							"name": "Check_Application_Status",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"application_id\": 3,\r\n  \"student_id\": 7,\r\n  \"status\": \"ACCEPTED\",\r\n  \"position\": {\r\n    \"position_id\": 3,\r\n    \"title\": \"Software Engineering Intern\"\r\n  }\r\n}\r\n"
+						},
+						{
+							"name": "Error_Application_Not_Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{staff_token}}",
+										"type": "text",
+										"disabled": true
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3"
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application not found\"\r\n}\r\n"
+						}
+					]
+				}
+			],
+			"description": "This folder focuses on staff responsibilities in the workflow:\n\n- Viewing all applications (`/api/applications/all_applications`)\n    \n- Shortlisting applications (`/api/applications/:id/shortlist`)\n    \n- Filtering applications by status (`/api/applications/status/:status_name`)\n    \n\nAll requests in this folder assume the caller has the **staff** role and use the `staff_token` from the pre-request script.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							"// =============================\r",
+							"// Staff Auto Signup + Login\r",
+							"// =============================\r",
+							"\r",
+							"// If we already have a token, don't do anything\r",
+							"if (pm.environment.get(\"staff_token\")) {\r",
+							"    console.log(\"staff_token already present\");\r",
+							"    return;\r",
+							"}\r",
+							"\r",
+							"const baseUrl = pm.environment.get(\"base_url\") || \"http://localhost:5000\";\r",
+							"const staffCredentials = {\r",
+							"    username: \"staff1\",\r",
+							"    password: \"test123\"\r",
+							"};\r",
+							"\r",
+							"// Helper: log in staff and set token\r",
+							"function loginStaff() {\r",
+							"    console.log(\"Attempting staff login...\");\r",
+							"\r",
+							"    const loginRequest = {\r",
+							"        url: baseUrl + \"/api/login\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify(staffCredentials)\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(loginRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Staff login error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code === 200) {\r",
+							"            const data = res.json();\r",
+							"            if (!data.access_token) {\r",
+							"                console.error(\"Staff login succeeded but no access_token in response\");\r",
+							"                return;\r",
+							"            }\r",
+							"            pm.environment.set(\"staff_token\", data.access_token);\r",
+							"            console.log(\"staff_token set from login\");\r",
+							"        } else if (res.code === 401) {\r",
+							"            console.log(\"Staff login failed with 401 – trying signup...\");\r",
+							"            signupStaffAndLogin();\r",
+							"        } else {\r",
+							"            console.error(\"Staff login failed with status\", res.code, res.json());\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Helper: sign up staff, then log in\r",
+							"function signupStaffAndLogin() {\r",
+							"    console.log(\"Signing up test staff user...\");\r",
+							"\r",
+							"    const signupRequest = {\r",
+							"        url: baseUrl + \"/api/signup\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                username: staffCredentials.username,\r",
+							"                password: staffCredentials.password,\r",
+							"                type: \"staff\"\r",
+							"            })\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(signupRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Staff signup error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code !== 200) {\r",
+							"            console.error(\"Staff signup failed with status\", res.code, res.json());\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        console.log(\"Staff signup successful, logging in...\");\r",
+							"        loginStaff();\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Start by trying to log in\r",
+							"loginStaff();\r",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Employer_Tests",
+			"item": [
+				{
+					"name": "Signup_Employer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Employer signup returns expected status\", function () {\r",
+									"    pm.expect([200, 400, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Employer signup response has expected fields\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        pm.environment.set(\"employer_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\",\r\n  \"type\": \"employer\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/signup",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"signup"
+							]
+						},
+						"description": "Creates a new employer account"
+					},
+					"response": [
+						{
+							"name": "Signup_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\",\r\n  \"type\": \"employer\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/signup",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"signup"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.employer.token.example\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Login_Employer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Login returns 200 or 401\", function () {\r",
+									"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Login response has token or error message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    if (pm.response.code === 200) {\r",
+									"        pm.expect(json).to.have.property(\"access_token\");\r",
+									"        pm.environment.set(\"login_token\", json.access_token);\r",
+									"    } else {\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"login"
+							]
+						},
+						"description": "Authenticates an employer and returns a JWT token"
+					},
+					"response": [
+						{
+							"name": "Login_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/login",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"login"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.employer.login.token\"\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Employer_Create_Position",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Create position status is as expected\", function () {\r",
+									"    pm.expect([201, 400, 403]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Create position response has message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"    if (pm.response.code === 201) {\r",
+									"        pm.expect(json).to.have.property(\"opening_id\");\r",
+									"        pm.environment.set(\"position_id\", json.opening_id.toString());\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Software Engineering Intern\",\r\n  \"number\": 3\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/openings/1",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"openings",
+								"1"
+							]
+						},
+						"description": "Creates a new position opening for the logged-in employer"
+					},
+					"response": [
+						{
+							"name": "Employer_Create_Position",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"title\": \"Software Engineering Intern\",\r\n  \"number\": 3\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/1",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"1"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Job opening created successfully\",\r\n  \"opening_id\": 1\r\n}\r\n"
+						}
+					]
+				},
+				{
+					"name": "Employer_Decide",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Decision status is valid\", function () {\r",
+									"    pm.expect([200, 400, 403, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Decision response has message\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    pm.expect(json).to.have.property(\"message\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"3",
+								"decision"
+							]
+						},
+						"description": "Allows an employer to move a shortlisted application to ACCEPTED or REJECTED"
+					},
+					"response": [
+						{
+							"name": "Employer_Decide_Accept",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "{\r\n  \"message\": \"Application 2 has been accepted.\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Invalid_Decision_Value",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Decision must be either 'ACCEPTED' or 'REJECTED'\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Not_A_Employer",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "Forbidden",
+							"code": 403,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Only employers can make decisions on applications\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Application_Not_Found",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application not found\"\r\n}\r\n"
+						},
+						{
+							"name": "Error_Decide_On_Non_Shortlisted_Application",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application is not in SHORTLISTED status\"\r\n}\r\n"
+						},
+						{
+							"name": "Employer_Decide_Reject",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{employer_token}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n  \"decision\": \"ACCEPTED\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/applications/3/decision",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"applications",
+										"3",
+										"decision"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": null,
+							"header": null,
+							"cookie": [],
+							"body": "{\r\n  \"message\": \"Application 2 has been rejected.\"\r\n}"
+						}
+					]
+				},
+				{
+					"name": "Employer_View_My_Openings",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"My openings returns valid status\", function () {\r",
+									"    pm.expect([200, 403, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"My openings is an array with expected fields\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.be.an(\"array\");\r",
+									"        if (json.length > 0) {\r",
+									"            const pos = json[0];\r",
+									"            pm.expect(pos).to.have.property(\"position_id\");\r",
+									"            pm.expect(pos).to.have.property(\"title\");\r",
+									"            pm.expect(pos).to.have.property(\"number_of_positions\");\r",
+									"            pm.expect(pos).to.have.property(\"employer_id\");\r",
+									"            \r",
+									"            pm.environment.set(\"position_id\", pos.position_id.toString());\r",
+									"        }\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Error response has message\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/openings/my",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"openings",
+								"my"
+							]
+						},
+						"description": "Lists all job openings created by the current employer"
+					},
+					"response": [
+						{
+							"name": "Employer_View_My_Openings",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/my",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"my"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"position_id\": 1,\r\n    \"title\": \"Software Engineering Intern\",\r\n    \"number_of_positions\": 3,\r\n    \"employer_id\": 10\r\n  },\r\n  {\r\n    \"position_id\": 2,\r\n    \"title\": \"Data Analyst Intern\",\r\n    \"number_of_positions\": 2,\r\n    \"employer_id\": 10\r\n  }\r\n]\r\n"
+						}
+					]
+				},
+				{
+					"name": "Employer_View_Shortlisted_Per_Position",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Opening applications returns valid status\", function () {\r",
+									"    pm.expect([200, 403, 404]).to.include(pm.response.code);\r",
+									"});\r",
+									"\r",
+									"if (pm.response.code === 200) {\r",
+									"    pm.test(\"Opening applications is an array of applications\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.be.an(\"array\");\r",
+									"        if (json.length > 0) {\r",
+									"            const app = json[0];\r",
+									"            pm.expect(app).to.have.property(\"application_id\");\r",
+									"            pm.expect(app).to.have.property(\"student_id\");\r",
+									"            pm.expect(app).to.have.property(\"status\");\r",
+									"        }\r",
+									"    });\r",
+									"} else {\r",
+									"    pm.test(\"Error response has message\", function () {\r",
+									"        const json = pm.response.json();\r",
+									"        pm.expect(json).to.have.property(\"message\");\r",
+									"    });\r",
+									"}\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{employer_token}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/openings/10/applications",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"openings",
+								"10",
+								"applications"
+							]
+						},
+						"description": "Returns applications shortlisted to a specific position owned by the employer."
+					},
+					"response": [
+						{
+							"name": "Employer_View_Shortlisted_Per_Position",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer ",
+										"type": "text"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "http://127.0.0.1:5000/api/openings/10/applications",
+									"protocol": "http",
+									"host": [
+										"127",
+										"0",
+										"0",
+										"1"
+									],
+									"port": "5000",
+									"path": [
+										"api",
+										"openings",
+										"10",
+										"applications"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "",
+							"header": [],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"domain": "",
+									"path": ""
+								}
+							],
+							"body": "[\r\n  {\r\n    \"application_id\": 2,\r\n    \"student_id\": 6,\r\n    \"status\": \"SHORTLISTED\"\r\n  },\r\n  {\r\n    \"application_id\": 3,\r\n    \"student_id\": 7,\r\n    \"status\": \"ACCEPTED\"\r\n  }\r\n]\r\n"
+						}
+					]
+				}
+			],
+			"description": "StartFragment\n\nThis folder focuses on the employer side of the process:\n\n- Creating position openings (`/api/openings/:id`)\n    \n- Listing their own openings (`/api/openings/my`)\n    \n- Viewing applications shortlisted to a specific opening (`/api/openings/:position_id/applications`)\n    \n- Making final decisions on applications (`/api/applications/:id/decision`) – moving from **SHORTLISTED → ACCEPTED/REJECTED**\n    \n\nAll requests in this folder assume the caller has the **employer** role and use the `employer_token` provided by the pre-request script.  \n  \n\nEndFragment",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {},
+						"exec": [
+							"// =============================\r",
+							"// Employer Auto Signup + Login\r",
+							"// =============================\r",
+							"\r",
+							"// If we already have a token, don't do anything\r",
+							"if (pm.environment.get(\"employer_token\")) {\r",
+							"    console.log(\"employer_token already present\");\r",
+							"    return;\r",
+							"}\r",
+							"\r",
+							"const baseUrl = pm.environment.get(\"base_url\") || \"http://localhost:5000\";\r",
+							"const employerCredentials = {\r",
+							"    username: \"employer1\",\r",
+							"    password: \"test123\"\r",
+							"};\r",
+							"\r",
+							"// Helper: log in employer and set token\r",
+							"function loginEmployer() {\r",
+							"    console.log(\"Attempting employer login...\");\r",
+							"\r",
+							"    const loginRequest = {\r",
+							"        url: baseUrl + \"/api/login\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify(employerCredentials)\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(loginRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Employer login error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code === 200) {\r",
+							"            const data = res.json();\r",
+							"            if (!data.access_token) {\r",
+							"                console.error(\"Employer login succeeded but no access_token returned\");\r",
+							"                return;\r",
+							"            }\r",
+							"            pm.environment.set(\"employer_token\", data.access_token);\r",
+							"            console.log(\"employer_token set from login\");\r",
+							"        } else if (res.code === 401) {\r",
+							"            console.log(\"Employer login failed with 401 – attempting signup...\");\r",
+							"            signupEmployerAndLogin();\r",
+							"        } else {\r",
+							"            console.error(\"Employer login failed with status\", res.code, res.json());\r",
+							"        }\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Helper: sign up employer, then log in\r",
+							"function signupEmployerAndLogin() {\r",
+							"    console.log(\"Signing up test employer user...\");\r",
+							"\r",
+							"    const signupRequest = {\r",
+							"        url: baseUrl + \"/api/signup\",\r",
+							"        method: \"POST\",\r",
+							"        header: { \"Content-Type\": \"application/json\" },\r",
+							"        body: {\r",
+							"            mode: \"raw\",\r",
+							"            raw: JSON.stringify({\r",
+							"                username: employerCredentials.username,\r",
+							"                password: employerCredentials.password,\r",
+							"                type: \"employer\"\r",
+							"            })\r",
+							"        }\r",
+							"    };\r",
+							"\r",
+							"    pm.sendRequest(signupRequest, function (err, res) {\r",
+							"        if (err) {\r",
+							"            console.error(\"Employer signup error:\", err);\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        if (res.code !== 200) {\r",
+							"            console.error(\"Employer signup failed with status\", res.code, res.json());\r",
+							"            return;\r",
+							"        }\r",
+							"\r",
+							"        console.log(\"Employer signup successful — logging in...\");\r",
+							"        loginEmployer();\r",
+							"    });\r",
+							"}\r",
+							"\r",
+							"// Start by trying to log in\r",
+							"loginEmployer();\r",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Identify_User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Identify status is 200 or unauthorized\", function () {\r",
+							"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+							"});\r",
+							"\r",
+							"if (pm.response.code === 200) {\r",
+							"    pm.test(\"Identify returns message with username and id\", function () {\r",
+							"        const json = pm.response.json();\r",
+							"        pm.expect(json).to.have.property(\"message\");\r",
+							"        pm.expect(json.message).to.include(\"username:\");\r",
+							"        pm.expect(json.message).to.include(\"id\");\r",
+							"    });\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/identify",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"identify"
+					]
+				},
+				"description": "Shows the currently authenticated user via JWT"
+			},
+			"response": [
+				{
+					"name": "Identify_User",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/identify",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"identify"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"message\": \"username: student5, id : 8\"\r\n}\r\n"
+				}
+			]
+		},
+		{
+			"name": "Health",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Health payload is correct\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"status\", \"ok\");\r",
+							"    pm.expect(json).to.have.property(\"message\", \"pong\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/applications/ping",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"applications",
+						"ping"
+					]
+				},
+				"description": "Simple health check returning \"pong.\""
+			},
+			"response": [
+				{
+					"name": "Health",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/applications/ping",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"applications",
+								"ping"
+							]
+						}
+					},
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"status\": \"ok\",\r\n  \"message\": \"pong\"\r\n}\r\n"
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login returns 200 or 401\", function () {\r",
+							"    pm.expect([200, 401]).to.include(pm.response.code);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login response has token or error message\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    if (pm.response.code === 200) {\r",
+							"        pm.expect(json).to.have.property(\"access_token\");\r",
+							"        pm.environment.set(\"login_token\", json.access_token);\r",
+							"    } else {\r",
+							"        pm.expect(json).to.have.property(\"message\");\r",
+							"    }\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"login"
+					]
+				},
+				"description": "General Login for any user type (Staff/Student/Employer)"
+			},
+			"response": [
+				{
+					"name": "Login",
+					"originalRequest": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"banks\",\r\n  \"password\": \"bank123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/login",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"login"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"access_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.login.copy.token\"\r\n}\r\n"
+				}
+			]
+		},
+		{
+			"name": "Logout",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Logout status is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Logout message is correct\", function () {\r",
+							"    const json = pm.response.json();\r",
+							"    pm.expect(json).to.have.property(\"message\", \"Logged Out!\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {},
+						"requests": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:5000/api/logout",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"logout"
+					]
+				},
+				"description": "Clears JWT cookies and logs out the current user."
+			},
+			"response": [
+				{
+					"name": "Logout",
+					"originalRequest": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"username\": \"student5\",\r\n  \"password\": \"test123\"\r\n}\r\n"
+						},
+						"url": {
+							"raw": "http://127.0.0.1:5000/api/logout",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "5000",
+							"path": [
+								"api",
+								"logout"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "",
+					"header": [],
+					"cookie": [
+						{
+							"expires": "Invalid Date",
+							"domain": "",
+							"path": ""
+						}
+					],
+					"body": "{\r\n  \"message\": \"Logged Out!\"\r\n}\r\n"
+				}
+			]
+		}
+	]
+}
